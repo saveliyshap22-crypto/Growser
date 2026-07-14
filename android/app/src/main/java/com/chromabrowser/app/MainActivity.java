@@ -27,6 +27,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
 import android.webkit.GeolocationPermissions;
 import android.webkit.PermissionRequest;
+import android.webkit.RenderProcessGoneDetail;
 import android.webkit.SafeBrowsingResponse;
 import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
@@ -37,7 +38,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.webkit.WebViewRenderProcessGoneDetail;
 import android.webkit.URLUtil;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -340,7 +340,7 @@ public class MainActivity extends Activity {
         for (int index = 0; index < tabs.size(); index++) {
             BrowserTab tab = tabs.get(index);
             TextView chip = new TextView(this);
-            chip.setText(ellipsize(tab.title, 20) + (index == selectedTab ? "  ×" : ""));
+            chip.setText(ellipsize(tab.title, 20));
             chip.setTextColor(index == selectedTab ? Color.rgb(245, 247, 250) : Color.rgb(173, 179, 189));
             chip.setTextSize(12);
             chip.setGravity(Gravity.CENTER_VERTICAL);
@@ -1056,7 +1056,7 @@ public class MainActivity extends Activity {
         }
 
         @Override
-        public boolean onRenderProcessGone(WebView view, WebViewRenderProcessGoneDetail detail) {
+        public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
             int index = tabs.indexOf(tab);
             if (index >= 0) {
                 String url = view.getUrl();
