@@ -3,6 +3,7 @@ name: Release
 on:
   push:
     tags: ["v*"]
+    branches: ["agent/chroma-browser-foundation"]
   workflow_dispatch:
     inputs:
       version:
@@ -16,10 +17,11 @@ permissions:
 jobs:
   windows:
     name: Package Windows
+    if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, 'Publish Chroma Browser v0.2.0')
     runs-on: windows-latest
     timeout-minutes: 50
     env:
-      RAW_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.2.0' }}
 
     steps:
       - name: Checkout
@@ -73,10 +75,11 @@ jobs:
 
   android:
     name: Package Android
+    if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, 'Publish Chroma Browser v0.2.0')
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
-      RAW_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.2.0' }}
 
     steps:
       - name: Checkout
@@ -128,7 +131,7 @@ jobs:
   publish:
     name: Publish GitHub Release
     needs: [windows, android]
-    if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'Publish Chroma Browser v0.2.0')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -141,13 +144,27 @@ jobs:
           path: release-assets
           merge-multiple: true
 
+      - name: Resolve release tag
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            tag="$GITHUB_REF_NAME"
+          elif [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            tag="v${{ inputs.version }}"
+          else
+            tag="v0.2.0"
+          fi
+          echo "RELEASE_TAG=$tag" >> "$GITHUB_ENV"
+
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
           draft: false
           prerelease: false
           generate_release_notes: true
-          name: Chroma Browser ${{ github.ref_name }}
+          tag_name: ${{ env.RELEASE_TAG }}
+          target_commitish: ${{ github.sha }}
+          name: Chroma Browser ${{ env.RELEASE_TAG }}
           body: |
             Chroma Browser for Windows and Android.
 
