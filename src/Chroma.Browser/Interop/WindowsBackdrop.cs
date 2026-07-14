@@ -7,7 +7,9 @@ namespace Chroma.Browser.Interop;
 public static class WindowsBackdrop
 {
     private const int DwmUseImmersiveDarkMode = 20;
+    private const int DwmWindowCornerPreference = 33;
     private const int DwmSystemBackdropType = 38;
+    private const int RoundWindowCorners = 2;
     private const int MainWindowBackdrop = 2;
 
     public static void Apply(Window window, bool enabled, bool dark)
@@ -25,6 +27,8 @@ public static class WindowsBackdrop
 
         var darkValue = dark ? 1 : 0;
         _ = DwmSetWindowAttribute(handle, DwmUseImmersiveDarkMode, ref darkValue, sizeof(int));
+        var corners = RoundWindowCorners;
+        _ = DwmSetWindowAttribute(handle, DwmWindowCornerPreference, ref corners, sizeof(int));
         var backdrop = enabled ? MainWindowBackdrop : 1;
         _ = DwmSetWindowAttribute(handle, DwmSystemBackdropType, ref backdrop, sizeof(int));
     }

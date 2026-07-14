@@ -49,8 +49,10 @@ public sealed class UpdateService
                 return null;
             }
 
+            var installerName = installer.GetProperty("name").GetString() ?? string.Empty;
             var checksum = assets.FirstOrDefault(asset =>
-                (asset.GetProperty("name").GetString() ?? string.Empty).EndsWith(".sha256", StringComparison.OrdinalIgnoreCase));
+                (asset.GetProperty("name").GetString() ?? string.Empty)
+                    .Equals(installerName + ".sha256", StringComparison.OrdinalIgnoreCase));
 
             return new UpdateInfo(
                 version,
@@ -116,7 +118,7 @@ public sealed class UpdateService
     private static HttpClient CreateClient()
     {
         var client = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("ChromaBrowser/0.1");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("ChromaBrowser/0.2");
         client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
         return client;
     }

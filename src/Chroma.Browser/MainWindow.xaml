@@ -18,7 +18,7 @@
         PreviewKeyDown="Window_PreviewKeyDown">
     <shell:WindowChrome.WindowChrome>
         <shell:WindowChrome CaptionHeight="0"
-                            CornerRadius="0"
+                            CornerRadius="18"
                             GlassFrameThickness="0"
                             ResizeBorderThickness="6"
                             UseAeroCaptionButtons="False" />
@@ -27,7 +27,7 @@
     <Grid x:Name="RootGrid">
         <Grid.RowDefinitions>
             <RowDefinition x:Name="TitleRow" Height="45" />
-            <RowDefinition x:Name="ToolbarRow" Height="56" />
+            <RowDefinition x:Name="ToolbarRow" Height="62" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -89,7 +89,7 @@
                                                     Background="{TemplateBinding Background}"
                                                     BorderBrush="{TemplateBinding BorderBrush}"
                                                     BorderThickness="{TemplateBinding BorderThickness}"
-                                                    CornerRadius="11,11,7,7">
+                                                    CornerRadius="18">
                                                 <ContentPresenter Margin="2" />
                                             </Border>
                                             <ControlTemplate.Triggers>
@@ -111,7 +111,7 @@
                     <Button Grid.Column="1" Margin="2,4" Style="{StaticResource IconButton}" Click="NewTab_Click" ToolTip="Новая вкладка (Ctrl+T)" Content="&#xE710;" />
                 </Grid>
 
-                <Border x:Name="PrivateBadge" Grid.Column="2" Margin="6,7" Padding="12,5" CornerRadius="12" Background="#403B4050" Visibility="Collapsed">
+                <Border x:Name="PrivateBadge" Grid.Column="2" Margin="6,7" Padding="13,5" CornerRadius="16" Background="#663B4050" BorderBrush="#35FFFFFF" BorderThickness="1" Visibility="Collapsed">
                     <TextBlock FontSize="12" Foreground="{StaticResource MutedTextBrush}" Text="ИНКОГНИТО" />
                 </Border>
 
@@ -123,7 +123,7 @@
             </Grid>
         </Border>
 
-        <Border Grid.Row="1" Padding="8,8" Background="#D4181B20" BorderBrush="#20FFFFFF" BorderThickness="0,0,0,1">
+        <Border Grid.Row="1" Margin="8,4,8,6" Padding="8,6" Background="#D72A2E36" BorderBrush="#38FFFFFF" BorderThickness="1" CornerRadius="25">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -139,7 +139,7 @@
 
                 <Grid Grid.Column="1">
                     <TextBox x:Name="AddressBar"
-                             Height="40"
+                             Height="44"
                              Style="{StaticResource GlassTextBox}"
                              FontSize="14"
                              TextChanged="AddressBar_TextChanged"
@@ -150,7 +150,7 @@
                            Placement="Bottom"
                            StaysOpen="False"
                            AllowsTransparency="True">
-                        <Border Width="620" MaxHeight="360" Margin="0,6,0,0" Padding="5" Background="#FA202329" BorderBrush="#4AFFFFFF" BorderThickness="1" CornerRadius="16">
+                        <Border Width="620" MaxHeight="360" Margin="0,8,0,0" Padding="6" Background="#FA202329" BorderBrush="#4AFFFFFF" BorderThickness="1" CornerRadius="22">
                             <ListBox x:Name="SuggestionsList"
                                      Background="Transparent"
                                      BorderThickness="0"
@@ -181,11 +181,11 @@
                 <ColumnDefinition x:Name="AiColumn" Width="0" />
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" Margin="0" Background="#111318" ClipToBounds="True">
+            <Border Grid.Column="0" Margin="8,0,8,8" Background="#111318" BorderBrush="#25FFFFFF" BorderThickness="1" CornerRadius="24" ClipToBounds="True">
                 <ContentControl x:Name="BrowserContent" />
             </Border>
 
-            <Border x:Name="AiPanel" Grid.Column="1" Background="#F21D2026" BorderBrush="#3DFFFFFF" BorderThickness="1,0,0,0" Visibility="Collapsed">
+            <Border x:Name="AiPanel" Grid.Column="1" Margin="0,0,8,8" Background="#F21D2026" BorderBrush="#3DFFFFFF" BorderThickness="1" CornerRadius="24" Visibility="Collapsed">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="6" />

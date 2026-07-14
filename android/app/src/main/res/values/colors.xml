@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="chroma_window">#111318</color>
+    <color name="chroma_panel">#E622252B</color>
+    <color name="chroma_glass">#B0343840</color>
+    <color name="chroma_text">#F5F7FA</color>
+    <color name="chroma_muted">#ADB3BD</color>
+    <color name="chroma_accent">#AEB8FF</color>
+</resources>

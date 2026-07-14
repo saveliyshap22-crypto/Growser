@@ -14,3 +14,8 @@ TestResults/
 src/Chroma.Browser/Resources/Generated/
 installer/MicrosoftEdgeWebview2Setup.exe
 upload/
+android/.gradle/
+android/local.properties
+android/**/build/
+*.jks
+*.keystore

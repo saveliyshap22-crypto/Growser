@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Chroma Browser</string>
+    <string name="new_tab">Новая вкладка</string>
+    <string name="address_hint">Поиск или адрес</string>
+    <string name="back">Назад</string>
+    <string name="forward">Вперёд</string>
+    <string name="reload">Обновить</string>
+    <string name="menu">Меню</string>
+    <string name="home">Главная</string>
+    <string name="bookmark">Закладка</string>
+    <string name="ai">ИИ</string>
+    <string name="tabs">Вкладки</string>
+    <string name="private_mode">ИНКОГНИТО</string>
+</resources>

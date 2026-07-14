@@ -1,5 +1,5 @@
 #ifndef MyAppVersion
-  #define MyAppVersion "0.1.0"
+  #define MyAppVersion "0.2.0"
 #endif
 
 #define MyAppName "Chroma Browser"
@@ -64,4 +64,3 @@ Root: HKCU; Subkey: "Software\Classes\ChromaBrowserURL\shell\open\command"; Valu
 [Run]
 Filename: "{tmp}\MicrosoftEdgeWebview2Setup.exe"; Parameters: "/silent /install"; StatusMsg: "Проверка Chromium WebView2 Runtime…"; Flags: waituntilterminated
 Filename: "{app}\{#MyAppExeName}"; Description: "Запустить Chroma Browser"; Flags: nowait postinstall skipifsilent
-
