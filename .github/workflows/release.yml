@@ -38,7 +38,7 @@ jobs:
       - name: Restore, test and publish
         shell: pwsh
         run: |
-          dotnet restore ChromaBrowser.sln
+          dotnet restore ChromaBrowser.sln -p:PublishReadyToRun=true
           dotnet test ChromaBrowser.sln -c Release --no-restore
           dotnet publish src/Chroma.Browser/Chroma.Browser.csproj -c Release -r win-x64 --self-contained true --no-restore -p:Version=$env:VERSION -p:FileVersion="$env:VERSION.0" -p:PublishReadyToRun=true -o artifacts/publish
 
@@ -79,4 +79,3 @@ jobs:
             artifacts/installer/*.exe
             artifacts/installer/*.sha256
           if-no-files-found: error
-
