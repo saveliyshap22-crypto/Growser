@@ -213,7 +213,7 @@ public sealed class AdBlockService
                 continue;
             }
 
-            var hostLine = line.Split([' ', '\t'], StringSplitOptions.RemoveEmptyEntries);
+            var hostLine = line.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
             if (hostLine.Length >= 2 && IPAddress.TryParse(hostLine[0], out _))
             {
                 AddDomain(hostLine[1], blocked);

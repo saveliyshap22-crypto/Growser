@@ -194,9 +194,7 @@ public partial class BrowserTabView : UserControl
         WebView.CoreWebView2.Profile.PreferredTrackingPreventionLevel = _settings.TrackingPrevention
             ? CoreWebView2TrackingPreventionLevel.Strict
             : CoreWebView2TrackingPreventionLevel.None;
-        WebView.CoreWebView2.Profile.EnhancedSecurityModeLevel = _settings.EnhancedSecurity
-            ? CoreWebView2EnhancedSecurityModeLevel.Strict
-            : CoreWebView2EnhancedSecurityModeLevel.Off;
+        ApplyEnhancedSecurity(WebView.CoreWebView2.Profile, _settings.EnhancedSecurity);
         WebView.CoreWebView2.Profile.DefaultDownloadFolderPath = _settings.DownloadFolder;
     }
 
@@ -247,9 +245,7 @@ public partial class BrowserTabView : UserControl
         core.Profile.PreferredTrackingPreventionLevel = _settings.TrackingPrevention
             ? CoreWebView2TrackingPreventionLevel.Strict
             : CoreWebView2TrackingPreventionLevel.None;
-        core.Profile.EnhancedSecurityModeLevel = _settings.EnhancedSecurity
-            ? CoreWebView2EnhancedSecurityModeLevel.Strict
-            : CoreWebView2EnhancedSecurityModeLevel.Off;
+        ApplyEnhancedSecurity(core.Profile, _settings.EnhancedSecurity);
         core.Profile.DefaultDownloadFolderPath = _settings.DownloadFolder;
 
         core.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
@@ -408,22 +404,24 @@ public partial class BrowserTabView : UserControl
             SourceUrl = operation.Uri,
             TargetPath = args.ResultFilePath,
             TotalBytes = operation.TotalBytesToReceive ?? 0,
-            ReceivedBytes = operation.BytesReceived,
+            ReceivedBytes = ToLong(operation.BytesReceived),
             State = DownloadState.InProgress,
             Operation = operation
         };
 
         operation.BytesReceivedChanged += (_, _) =>
         {
-            record.ReceivedBytes = operation.BytesReceived;
+            record.ReceivedBytes = ToLong(operation.BytesReceived);
             DownloadChanged?.Invoke(this, record);
         };
         operation.StateChanged += (_, _) =>
         {
             record.State = operation.State switch
             {
-                CoreWebView2DownloadState.InProgress => operation.IsPaused ? DownloadState.Paused : DownloadState.InProgress,
+                CoreWebView2DownloadState.InProgress => DownloadState.InProgress,
                 CoreWebView2DownloadState.Completed => DownloadState.Completed,
+                CoreWebView2DownloadState.Interrupted when operation.CanResume => DownloadState.Paused,
+                CoreWebView2DownloadState.Interrupted when operation.InterruptReason == CoreWebView2DownloadInterruptReason.UserCanceled => DownloadState.Cancelled,
                 CoreWebView2DownloadState.Interrupted => DownloadState.Interrupted,
                 _ => DownloadState.Interrupted
             };
@@ -492,5 +490,23 @@ public partial class BrowserTabView : UserControl
         }
 
         return Path.Combine(directory, $"{name}-{Guid.NewGuid():N}{extension}");
+    }
+
+    private static long ToLong(ulong value) => value > long.MaxValue ? long.MaxValue : (long)value;
+
+    private static void ApplyEnhancedSecurity(CoreWebView2Profile profile, bool enabled)
+    {
+        try
+        {
+            var property = profile.GetType().GetProperty("EnhancedSecurityModeLevel");
+            if (property is { CanWrite: true } && property.PropertyType.IsEnum)
+            {
+                property.SetValue(profile, Enum.Parse(property.PropertyType, enabled ? "Strict" : "Off"));
+            }
+        }
+        catch (Exception exception)
+        {
+            LogService.Instance.Warn($"Enhanced security mode is unavailable in this WebView2 Runtime: {exception.Message}");
+        }
     }
 }

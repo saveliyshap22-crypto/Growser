@@ -213,18 +213,21 @@ public partial class DataWindow : Window
 
     private void PauseDownload_Click(object sender, RoutedEventArgs e)
     {
-        if (DownloadGrid.SelectedItem is not DownloadRecord { Operation: { } operation })
+        if (DownloadGrid.SelectedItem is not DownloadRecord record || record.Operation is not { } operation)
         {
             return;
         }
 
-        if (operation.IsPaused)
+        if (record.State == DownloadState.Paused ||
+            operation.State == Microsoft.Web.WebView2.Core.CoreWebView2DownloadState.Interrupted && operation.CanResume)
         {
             operation.Resume();
+            record.State = DownloadState.InProgress;
         }
         else
         {
             operation.Pause();
+            record.State = DownloadState.Paused;
         }
 
         Refresh();
@@ -235,6 +238,7 @@ public partial class DataWindow : Window
         if (DownloadGrid.SelectedItem is DownloadRecord { Operation: { } operation })
         {
             operation.Cancel();
+            ((DownloadRecord)DownloadGrid.SelectedItem).State = DownloadState.Cancelled;
             Refresh();
         }
     }

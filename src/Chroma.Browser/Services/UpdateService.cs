@@ -95,7 +95,7 @@ public sealed class UpdateService
         if (update.ChecksumUrl is not null)
         {
             var expectedText = await Client.GetStringAsync(update.ChecksumUrl, cancellationToken).ConfigureAwait(false);
-            var expected = expectedText.Split([' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries)[0];
+            var expected = expectedText.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)[0];
             await using var file = File.OpenRead(target);
             var actual = Convert.ToHexString(await SHA256.HashDataAsync(file, cancellationToken).ConfigureAwait(false));
             if (!actual.Equals(expected, StringComparison.OrdinalIgnoreCase))
