@@ -404,14 +404,14 @@ public partial class BrowserTabView : UserControl
             SourceUrl = operation.Uri,
             TargetPath = args.ResultFilePath,
             TotalBytes = operation.TotalBytesToReceive ?? 0,
-            ReceivedBytes = ToLong(operation.BytesReceived),
+            ReceivedBytes = operation.BytesReceived,
             State = DownloadState.InProgress,
             Operation = operation
         };
 
         operation.BytesReceivedChanged += (_, _) =>
         {
-            record.ReceivedBytes = ToLong(operation.BytesReceived);
+            record.ReceivedBytes = operation.BytesReceived;
             DownloadChanged?.Invoke(this, record);
         };
         operation.StateChanged += (_, _) =>
@@ -491,8 +491,6 @@ public partial class BrowserTabView : UserControl
 
         return Path.Combine(directory, $"{name}-{Guid.NewGuid():N}{extension}");
     }
-
-    private static long ToLong(ulong value) => value > long.MaxValue ? long.MaxValue : (long)value;
 
     private static void ApplyEnhancedSecurity(CoreWebView2Profile profile, bool enabled)
     {

@@ -43,8 +43,8 @@ public sealed class DownloadRecord
     public string FileName { get; set; } = string.Empty;
     public string SourceUrl { get; set; } = string.Empty;
     public string TargetPath { get; set; } = string.Empty;
-    public long TotalBytes { get; set; }
-    public long ReceivedBytes { get; set; }
+    public ulong TotalBytes { get; set; }
+    public ulong ReceivedBytes { get; set; }
     public DownloadState State { get; set; } = DownloadState.Starting;
     public DateTimeOffset StartedAt { get; set; } = DateTimeOffset.Now;
 
@@ -74,4 +74,3 @@ public sealed class VaultEntry
     public string Password { get; set; } = string.Empty;
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.Now;
 }
-
