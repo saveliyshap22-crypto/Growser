@@ -755,7 +755,9 @@ public class MainActivity extends Activity {
             }
             pendingWebPermission = null;
         } else if (requestCode == GEOLOCATION_PERMISSION_REQUEST && pendingGeolocationCallback != null) {
-            pendingGeolocationCallback.invoke(pendingGeolocationOrigin, granted, false);
+            boolean locationGranted = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+            pendingGeolocationCallback.invoke(pendingGeolocationOrigin, locationGranted, false);
             pendingGeolocationCallback = null;
             pendingGeolocationOrigin = null;
         } else if (requestCode == STORAGE_PERMISSION_REQUEST && pendingDownload != null) {
@@ -1131,7 +1133,10 @@ public class MainActivity extends Activity {
                     } else {
                         pendingGeolocationOrigin = origin;
                         pendingGeolocationCallback = callback;
-                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, GEOLOCATION_PERMISSION_REQUEST);
+                        requestPermissions(new String[]{
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        }, GEOLOCATION_PERMISSION_REQUEST);
                     }
                 })
                 .setNegativeButton("Запретить", (dialog, which) -> callback.invoke(origin, false, false))
