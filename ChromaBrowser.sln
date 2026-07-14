@@ -1,0 +1,25 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chroma.Browser", "src\Chroma.Browser\Chroma.Browser.csproj", "{3C5C8775-239E-41BC-9094-F8B5BAF7BEF0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chroma.Browser.Tests", "tests\Chroma.Browser.Tests\Chroma.Browser.Tests.csproj", "{A28F5B64-9A5F-4A12-827D-AB98D2C75F47}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3C5C8775-239E-41BC-9094-F8B5BAF7BEF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C5C8775-239E-41BC-9094-F8B5BAF7BEF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C5C8775-239E-41BC-9094-F8B5BAF7BEF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C5C8775-239E-41BC-9094-F8B5BAF7BEF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A28F5B64-9A5F-4A12-827D-AB98D2C75F47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A28F5B64-9A5F-4A12-827D-AB98D2C75F47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A28F5B64-9A5F-4A12-827D-AB98D2C75F47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A28F5B64-9A5F-4A12-827D-AB98D2C75F47}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
+

@@ -1,0 +1,16 @@
+bin/
+obj/
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+artifacts/
+publish/
+TestResults/
+*.nupkg
+*.snupkg
+src/Chroma.Browser/Resources/Generated/
+installer/MicrosoftEdgeWebview2Setup.exe
+upload/
