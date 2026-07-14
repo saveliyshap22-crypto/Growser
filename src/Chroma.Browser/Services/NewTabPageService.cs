@@ -23,7 +23,7 @@ public static class NewTabPageService
         var searchAction = queryIndex >= 0 ? settings.SearchUrlTemplate[..queryIndex] : settings.SearchUrlTemplate;
         var searchUrl = WebUtility.HtmlEncode(searchAction.Replace("{0}", string.Empty, StringComparison.Ordinal));
 
-        return $$"""
+        return $$$"""
             <!doctype html>
             <html lang="ru">
             <head>
@@ -34,7 +34,7 @@ public static class NewTabPageService
               <style>
                 :root { color-scheme: dark; font-family: 'Segoe UI Variable Text','Segoe UI',sans-serif; }
                 * { box-sizing: border-box; }
-                body { margin:0; min-height:100vh; overflow:hidden; color:#f6f7fb; background:{{wallpaper}}; }
+                body { margin:0; min-height:100vh; overflow:hidden; color:#f6f7fb; background:{{{wallpaper}}}; }
                 body::before { content:''; position:fixed; inset:-80px; background:radial-gradient(circle at 18% 20%,#8b98ff32,transparent 30%),radial-gradient(circle at 80% 70%,#d2d6ff1f,transparent 38%); filter:blur(12px); }
                 main { position:relative; z-index:1; width:min(820px,calc(100vw - 48px)); margin:0 auto; padding-top:clamp(90px,16vh,180px); }
                 .private { width:max-content; max-width:100%; margin:0 auto 24px; padding:9px 14px; border:1px solid #ffffff30; border-radius:999px; background:#20232bb3; backdrop-filter:blur(24px); color:#cbd0da; font-size:13px; }
@@ -55,13 +55,13 @@ public static class NewTabPageService
             </head>
             <body>
               <main>
-                {{privateBadge}}
+                {{{privateBadge}}}
                 <h1>Chroma <span>Browser</span></h1>
-                <form action="{{searchUrl}}" method="get" onsubmit="this.action=this.action||'https://www.google.com/search';">
+                <form action="{{{searchUrl}}}" method="get" onsubmit="this.action=this.action||'https://www.google.com/search';">
                   <input name="q" autofocus autocomplete="off" placeholder="Поиск или адрес">
                   <button type="submit">Найти</button>
                 </form>
-                <section class="shortcuts">{{shortcuts}}</section>
+                <section class="shortcuts">{{{shortcuts}}}</section>
                 <footer>Быстрые команды: !g · !ddg · !w · !yt · !ai</footer>
               </main>
             </body>
