@@ -44,7 +44,7 @@ public sealed class DownloadRecord
     public string SourceUrl { get; set; } = string.Empty;
     public string TargetPath { get; set; } = string.Empty;
     public ulong TotalBytes { get; set; }
-    public ulong ReceivedBytes { get; set; }
+    public long ReceivedBytes { get; set; }
     public DownloadState State { get; set; } = DownloadState.Starting;
     public DateTimeOffset StartedAt { get; set; } = DateTimeOffset.Now;
 
