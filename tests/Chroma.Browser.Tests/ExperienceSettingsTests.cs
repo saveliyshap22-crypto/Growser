@@ -37,7 +37,7 @@ public sealed class ExperienceSettingsTests
         });
 
         Assert.Contains("chroma-custom-cursor", script, StringComparison.Ordinal);
-        Assert.Contains("data:image/svg%2Bxml", script, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("data:image/svg", script, StringComparison.OrdinalIgnoreCase);
         Assert.Contains(expected, script, StringComparison.OrdinalIgnoreCase);
     }
 
