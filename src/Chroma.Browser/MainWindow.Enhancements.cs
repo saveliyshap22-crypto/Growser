@@ -94,7 +94,7 @@ public partial class MainWindow
             header.Item.Width = desired;
             header.Item.MinWidth = compactDensity ? 72 : 78;
             header.Title.FontSize = compactDensity ? 11.5 : 12.5;
-            header.Title.MaxWidth = Math.Max(24, desired - 55);
+            header.Title.MaxWidth = Math.Max(24, desired - 58);
             header.Title.TextTrimming = TextTrimming.CharacterEllipsis;
             header.Title.ToolTip = header.Title.Text;
             header.Close.Width = compactDensity ? 24 : 27;
@@ -102,7 +102,7 @@ public partial class MainWindow
             header.Close.Visibility = header.Item.Tag is Views.BrowserTabView view &&
                                       !view.IsPinned &&
                                       _settings.Current.ShowTabCloseButtons &&
-                                      desired >= 92
+                                      desired >= 98
                 ? Visibility.Visible
                 : Visibility.Collapsed;
         }
@@ -165,29 +165,9 @@ public partial class MainWindow
 
     private void ApplyDynamicAppearance()
     {
-        var accent = ParseAccent(_settings.Current.AccentColor);
-        var light = _settings.Current.Theme == ThemeMode.Light;
-        var glass = Math.Clamp(_settings.Current.GlassIntensity, 0.35, 1);
-
-        SetApplicationBrush("AccentBrush", Color.FromArgb(255, accent.R, accent.G, accent.B));
-        SetApplicationBrush("AccentSoftBrush", Color.FromArgb((byte)(34 + (glass * 34)), accent.R, accent.G, accent.B));
-        SetApplicationBrush("AccentMediumBrush", Color.FromArgb((byte)(88 + (glass * 48)), accent.R, accent.G, accent.B));
-        SetApplicationBrush("AccentStrongBrush", Color.FromArgb(232, accent.R, accent.G, accent.B));
-        SetApplicationBrush("AccentTextBrush", Blend(accent, Colors.White, 0.46));
-        SetApplicationBrush("AccentForegroundBrush", IsBright(accent) ? Color.FromRgb(22, 23, 27) : Colors.White);
-
-        var baseGlass = light ? Color.FromRgb(246, 247, 250) : Color.FromRgb(38, 41, 48);
-        var hoverGlass = light ? Color.FromRgb(234, 237, 242) : Color.FromRgb(56, 60, 70);
-        SetApplicationBrush("GlassBrush", Color.FromArgb((byte)(96 + (glass * 76)), baseGlass.R, baseGlass.G, baseGlass.B));
-        SetApplicationBrush("GlassStrongBrush", Color.FromArgb((byte)(170 + (glass * 72)), baseGlass.R, baseGlass.G, baseGlass.B));
-        SetApplicationBrush("GlassHoverBrush", Color.FromArgb((byte)(178 + (glass * 60)), hoverGlass.R, hoverGlass.G, hoverGlass.B));
-        SetApplicationBrush("GlassHighlightBrush", Color.FromArgb((byte)(18 + (glass * 24)), 255, 255, 255));
-
-        Application.Current.Resources["ControlCornerRadius"] = new CornerRadius(Math.Clamp(_settings.Current.CornerRadius, 8, 28));
-        Application.Current.Resources["PanelCornerRadius"] = new CornerRadius(Math.Clamp(_settings.Current.CornerRadius + 10, 18, 38));
-
-        Opacity = Math.Clamp(_settings.Current.InterfaceOpacity, 0.78, 1);
-        RootGrid.Opacity = _settings.Current.ShowAmbientGlow ? 1 : 0.985;
+        // MainWindow.Experience owns all visual resources so activation cannot
+        // accidentally restore an old glass palette over the selected mode.
+        QueueResponsiveLayout();
     }
 
     private async void AiQuickPrompt_Click(object sender, RoutedEventArgs e)
@@ -329,9 +309,11 @@ public partial class MainWindow
         }
 
         var pageText = await CurrentTab.GetPageTextAsync(false);
-        if (pageText.Length > 18_000)
+        var contextLimit = Math.Clamp(_settings.Current.AiContextCharacterLimit, 3_000, 30_000);
+        if (pageText.Length > contextLimit)
         {
-            pageText = pageText[..18_000];
+            pageText = pageText[..contextLimit];
+            AiStatus.Text = $"Контекст сокращён до {contextLimit:N0} символов";
         }
 
         if (string.IsNullOrWhiteSpace(pageText))

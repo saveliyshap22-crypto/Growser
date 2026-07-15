@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="chroma_window">#111318</color>
-    <color name="chroma_panel">#E622252B</color>
-    <color name="chroma_glass">#B0343840</color>
-    <color name="chroma_text">#F5F7FA</color>
-    <color name="chroma_muted">#ADB3BD</color>
-    <color name="chroma_accent">#AEB8FF</color>
+    <color name="chroma_window">#0F1115</color>
+    <color name="chroma_panel">#F01A1D23</color>
+    <color name="chroma_glass">#C1262A31</color>
+    <color name="chroma_glass_hover">#E13A3F49</color>
+    <color name="chroma_surface">#FF111318</color>
+    <color name="chroma_text">#F7F8FA</color>
+    <color name="chroma_muted">#B0B6C1</color>
+    <color name="chroma_accent">#FF8A3D</color>
+    <color name="chroma_accent_soft">#42FF8A3D</color>
+    <color name="chroma_divider">#36FF8A3D</color>
+    <color name="chroma_danger">#FF6575</color>
 </resources>

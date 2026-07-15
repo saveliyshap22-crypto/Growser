@@ -12,6 +12,7 @@
         ResizeMode="CanResize"
         AllowsTransparency="False"
         Icon="Resources/Chroma.png"
+        Initialized="Experience_Initialized"
         Loaded="Window_Loaded"
         Activated="Window_Activated"
         SizeChanged="Window_SizeChanged"
@@ -20,13 +21,13 @@
         PreviewKeyDown="Window_PreviewKeyDown">
     <shell:WindowChrome.WindowChrome>
         <shell:WindowChrome CaptionHeight="0"
-                            CornerRadius="22"
-                            GlassFrameThickness="0"
-                            ResizeBorderThickness="7"
-                            UseAeroCaptionButtons="False" />
+                                  CornerRadius="18"
+                                  GlassFrameThickness="0"
+                                  ResizeBorderThickness="7"
+                                  UseAeroCaptionButtons="False" />
     </shell:WindowChrome.WindowChrome>
 
-    <Grid x:Name="RootGrid" Background="{DynamicResource WindowBrush}">
+    <Grid x:Name="RootGrid" Background="{DynamicResource WindowBrush}" ClipToBounds="True">
         <Grid.RowDefinitions>
             <RowDefinition x:Name="TitleRow" Height="50" />
             <RowDefinition x:Name="ToolbarRow" Height="68" />
@@ -35,22 +36,70 @@
 
         <Border Grid.Row="0"
                 Background="{DynamicResource GlassStrongBrush}"
-                BorderBrush="{DynamicResource AccentSoftBrush}"
+                BorderBrush="{DynamicResource DividerBrush}"
                 BorderThickness="0,0,0,1"
                 MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Border Grid.Column="0" Width="36" Height="36" Margin="7" CornerRadius="13"
-                        Background="{DynamicResource AccentSoftBrush}"
-                        BorderBrush="{DynamicResource AccentMediumBrush}" BorderThickness="1">
-                    <Image Width="26" Height="26" Source="Resources/Chroma.png" IsHitTestVisible="False" />
-                </Border>
+                <Grid Grid.Column="0" Margin="7,5,5,5" shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                    <Border x:Name="AppLogoSurface"
+                            Width="38" Height="38"
+                            CornerRadius="{DynamicResource TabCornerRadius}"
+                            Background="{DynamicResource AccentSoftBrush}"
+                            BorderBrush="{DynamicResource AccentMediumBrush}"
+                            BorderThickness="1">
+                        <Grid>
+                            <Border Height="1" Margin="7,0" VerticalAlignment="Top" Background="{DynamicResource GlassHighlightBrush}" />
+                            <Image Width="27" Height="27" Source="Resources/Chroma.png" IsHitTestVisible="False" />
+                        </Grid>
+                    </Border>
+
+                    <Border x:Name="MediaPill"
+                            Width="248" Height="40"
+                            Visibility="Collapsed"
+                            Background="{DynamicResource GlassBrush}"
+                            BorderBrush="{DynamicResource AccentMediumBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{DynamicResource PillCornerRadius}"
+                            ClipToBounds="True"
+                            MouseLeftButtonUp="MediaPill_Click"
+                            ToolTip="Нажмите, чтобы открыть вкладку с музыкой">
+                        <Grid Margin="5,0,4,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="32" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="32" />
+                                <ColumnDefinition Width="32" />
+                            </Grid.ColumnDefinitions>
+                            <Border Width="28" Height="28" CornerRadius="{DynamicResource TabCornerRadius}"
+                                    Background="{DynamicResource AccentSoftBrush}">
+                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                                           FontFamily="Segoe Fluent Icons" FontSize="13"
+                                           Foreground="{DynamicResource AccentTextBrush}" Text="&#xE8D6;" />
+                            </Border>
+                            <StackPanel Grid.Column="1" Margin="7,3,5,3" VerticalAlignment="Center">
+                                <TextBlock x:Name="MediaTitleText" FontSize="11.5" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextBrush}"
+                                           Text="Сейчас играет" TextTrimming="CharacterEllipsis" />
+                                <TextBlock x:Name="MediaArtistText" Margin="0,1,0,0" FontSize="9.5"
+                                           Foreground="{DynamicResource MutedTextBrush}"
+                                           Text="Сайт" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                            <Button x:Name="MediaPlayPauseButton" Grid.Column="2" Width="29" Height="29"
+                                    Style="{StaticResource IconButton}" Click="MediaPlayPause_Click"
+                                    Content="&#xE769;" ToolTip="Пауза" />
+                            <Button x:Name="MediaMuteButton" Grid.Column="3" Width="29" Height="29"
+                                    Style="{StaticResource IconButton}" Click="MediaMute_Click"
+                                    Content="&#xE767;" ToolTip="Выключить звук" />
+                        </Grid>
+                    </Border>
+                </Grid>
 
                 <Grid Grid.Column="1" Margin="0,0,4,0">
                     <Grid.ColumnDefinitions>
@@ -69,7 +118,7 @@
                              BorderThickness="0"
                              Padding="0"
                              ScrollViewer.CanContentScroll="True"
-                             ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                             ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                              ScrollViewer.VerticalScrollBarVisibility="Disabled"
                              SelectionChanged="TabStrip_SelectionChanged"
                              PreviewMouseWheel="TabStrip_PreviewMouseWheel"
@@ -85,14 +134,14 @@
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
                                 <Setter Property="Width" Value="180" />
-                                <Setter Property="MinWidth" Value="76" />
+                                <Setter Property="MinWidth" Value="72" />
                                 <Setter Property="MaxWidth" Value="240" />
                                 <Setter Property="Height" Value="39" />
                                 <Setter Property="Padding" Value="0" />
                                 <Setter Property="Margin" Value="0,0,5,0" />
                                 <Setter Property="Background" Value="{DynamicResource GlassBrush}" />
                                 <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
-                                <Setter Property="BorderBrush" Value="#24FFFFFF" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" />
                                 <Setter Property="BorderThickness" Value="1" />
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                 <Setter Property="VerticalContentAlignment" Value="Stretch" />
@@ -103,14 +152,20 @@
                                                     Background="{TemplateBinding Background}"
                                                     BorderBrush="{TemplateBinding BorderBrush}"
                                                     BorderThickness="{TemplateBinding BorderThickness}"
-                                                    CornerRadius="17"
+                                                    CornerRadius="{DynamicResource TabCornerRadius}"
                                                     ClipToBounds="True"
+                                                    Opacity="1"
                                                     RenderTransformOrigin="0.5,0.5">
                                                 <Border.RenderTransform>
                                                     <TranslateTransform Y="0" />
                                                 </Border.RenderTransform>
                                                 <Grid>
-                                                    <Border Height="1" Margin="11,0" VerticalAlignment="Top" Background="{DynamicResource GlassHighlightBrush}" />
+                                                    <Border Height="1" Margin="10,0" VerticalAlignment="Top"
+                                                            Background="{DynamicResource GlassHighlightBrush}" />
+                                                    <Border x:Name="ActiveLine" Width="30" Height="2" Margin="0,0,0,2"
+                                                            VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                                                            CornerRadius="1" Background="{DynamicResource AccentBrush}"
+                                                            Visibility="Collapsed" />
                                                     <ContentPresenter Margin="2" />
                                                 </Grid>
                                             </Border>
@@ -118,8 +173,16 @@
                                                 <EventTrigger RoutedEvent="FrameworkElement.Loaded">
                                                     <BeginStoryboard>
                                                         <Storyboard>
-                                                            <DoubleAnimation Storyboard.TargetName="TabSurface" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.18" />
-                                                            <DoubleAnimation Storyboard.TargetName="TabSurface" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" From="7" To="0" Duration="0:0:0.18" />
+                                                            <DoubleAnimation Storyboard.TargetName="TabSurface"
+                                                                             Storyboard.TargetProperty="Opacity"
+                                                                             From="0" To="1" Duration="0:0:0.16" />
+                                                            <DoubleAnimation Storyboard.TargetName="TabSurface"
+                                                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                                                             From="6" To="0" Duration="0:0:0.18">
+                                                                <DoubleAnimation.EasingFunction>
+                                                                    <CubicEase EasingMode="EaseOut" />
+                                                                </DoubleAnimation.EasingFunction>
+                                                            </DoubleAnimation>
                                                         </Storyboard>
                                                     </BeginStoryboard>
                                                 </EventTrigger>
@@ -130,6 +193,7 @@
                                                 <Trigger Property="IsSelected" Value="True">
                                                     <Setter TargetName="TabSurface" Property="Background" Value="{DynamicResource AccentSoftBrush}" />
                                                     <Setter TargetName="TabSurface" Property="BorderBrush" Value="{DynamicResource AccentStrongBrush}" />
+                                                    <Setter TargetName="ActiveLine" Property="Visibility" Value="Visible" />
                                                     <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                                                 </Trigger>
                                             </ControlTemplate.Triggers>
@@ -157,24 +221,25 @@
                             ToolTip="Новая вкладка (Ctrl+T)" Content="&#xE710;" />
                 </Grid>
 
-                <Border x:Name="PrivateBadge" Grid.Column="2" Margin="6,8" Padding="13,5" CornerRadius="16"
+                <Border x:Name="PrivateBadge" Grid.Column="2" Margin="6,8" Padding="13,5"
+                        CornerRadius="{DynamicResource PillCornerRadius}"
                         Background="{DynamicResource AccentSoftBrush}" BorderBrush="{DynamicResource AccentMediumBrush}"
                         BorderThickness="1" Visibility="Collapsed">
                     <TextBlock FontSize="12" Foreground="{DynamicResource AccentTextBrush}" Text="ИНКОГНИТО" />
                 </Border>
 
                 <StackPanel Grid.Column="3" Orientation="Horizontal" shell:WindowChrome.IsHitTestVisibleInChrome="True">
-                    <Button Width="46" Height="50" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextBrush}" Click="Minimize_Click" Content="&#xE921;" FontFamily="Segoe Fluent Icons" />
-                    <Button Width="46" Height="50" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextBrush}" Click="Maximize_Click" Content="&#xE922;" FontFamily="Segoe Fluent Icons" />
-                    <Button Width="50" Height="50" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextBrush}" Click="Close_Click" Content="&#xE8BB;" FontFamily="Segoe Fluent Icons" />
+                    <Button Width="46" Height="50" Style="{StaticResource WindowCaptionButton}" Click="Minimize_Click" Content="&#xE921;" />
+                    <Button Width="46" Height="50" Style="{StaticResource WindowCaptionButton}" Click="Maximize_Click" Content="&#xE922;" />
+                    <Button Width="50" Height="50" Style="{StaticResource WindowCloseButton}" Click="Close_Click" Content="&#xE8BB;" />
                 </StackPanel>
             </Grid>
         </Border>
 
         <Border x:Name="ToolbarSurface" Grid.Row="1" Margin="10,6,10,8" Padding="9,7"
                 Background="{DynamicResource GlassStrongBrush}"
-                BorderBrush="{DynamicResource AccentSoftBrush}" BorderThickness="1"
-                CornerRadius="{DynamicResource PanelCornerRadius}">
+                BorderBrush="{DynamicResource DividerBrush}" BorderThickness="1"
+                CornerRadius="{DynamicResource PanelCornerRadius}" ClipToBounds="True">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -193,9 +258,9 @@
                              TextChanged="AddressBar_TextChanged" GotKeyboardFocus="AddressBar_GotKeyboardFocus"
                              PreviewKeyDown="AddressBar_PreviewKeyDown" />
                     <Popup x:Name="SuggestionsPopup" PlacementTarget="{Binding ElementName=AddressBar}" Placement="Bottom"
-                           StaysOpen="False" AllowsTransparency="True">
+                           StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade">
                         <Border Width="640" MaxHeight="370" Margin="0,9,0,0" Padding="7"
-                                Background="{DynamicResource GlassStrongBrush}"
+                                Background="{DynamicResource MenuSurfaceBrush}"
                                 BorderBrush="{DynamicResource AccentMediumBrush}" BorderThickness="1"
                                 CornerRadius="{DynamicResource PanelCornerRadius}">
                             <ListBox x:Name="SuggestionsList" Background="Transparent" BorderThickness="0"
@@ -226,7 +291,8 @@
             </Grid.ColumnDefinitions>
 
             <Border x:Name="BrowserHostBorder" Grid.Column="0" Margin="10,0,10,10"
-                    Background="#FF0B0C0F" BorderBrush="{DynamicResource AccentSoftBrush}"
+                    Background="{DynamicResource ContentSurfaceBrush}"
+                    BorderBrush="{DynamicResource DividerBrush}"
                     BorderThickness="1" CornerRadius="{DynamicResource PanelCornerRadius}" ClipToBounds="True">
                 <ContentControl x:Name="BrowserContent" />
             </Border>
@@ -244,24 +310,30 @@
                                   DragDelta="AiSplitter_DragDelta" DragCompleted="AiSplitter_DragCompleted" />
                     <Grid Grid.Column="1" Margin="12">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="46" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
-                            <RowDefinition Height="32" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <Grid Grid.Row="0">
+                        <Grid Grid.Row="0" Margin="1,0,0,5">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="42" />
                             </Grid.ColumnDefinitions>
-                            <ComboBox x:Name="AiProviderBox" Height="38" SelectionChanged="AiProviderBox_SelectionChanged" DisplayMemberPath="Name" />
-                            <Button Grid.Column="1" Margin="4,0,0,0" Style="{StaticResource IconButton}" Click="AiClose_Click" ToolTip="Закрыть AI" Content="&#xE8BB;" />
+                            <StackPanel>
+                                <TextBlock FontSize="18" FontWeight="SemiBold" Text="Chroma AI" />
+                                <TextBlock Margin="0,2,0,5" FontSize="10.5" Foreground="{DynamicResource MutedTextBrush}"
+                                           Text="Подготовьте запрос и вставьте его в официальный чат" TextTrimming="CharacterEllipsis" />
+                                <ComboBox x:Name="AiProviderBox" Height="38" SelectionChanged="AiProviderBox_SelectionChanged" DisplayMemberPath="Name" />
+                            </StackPanel>
+                            <Button Grid.Column="1" Margin="4,0,0,0" VerticalAlignment="Top"
+                                    Style="{StaticResource IconButton}" Click="AiClose_Click" ToolTip="Закрыть AI" Content="&#xE8BB;" />
                         </Grid>
 
                         <Border Grid.Row="1" Margin="0,8,0,8" Padding="10"
-                                Background="{DynamicResource GlassBrush}" BorderBrush="{DynamicResource AccentSoftBrush}"
+                                Background="{DynamicResource GlassBrush}" BorderBrush="{DynamicResource DividerBrush}"
                                 BorderThickness="1" CornerRadius="{DynamicResource ControlCornerRadius}">
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -282,7 +354,7 @@
                                               Checked="AiContext_Changed" Unchecked="AiContext_Changed" />
                                     <StackPanel Grid.Column="1" Orientation="Horizontal">
                                         <Button Margin="4,0,0,0" Style="{StaticResource GlassButton}" Click="AiCopyPrompt_Click" Content="Копировать" />
-                                        <Button Margin="4,0,0,0" Style="{StaticResource AccentButton}" Click="AiPasteToChat_Click" Content="Вставить в чат" />
+                                        <Button Margin="4,0,0,0" Style="{StaticResource AccentButton}" Click="AiPasteToChat_Click" Content="Вставить" />
                                     </StackPanel>
                                 </Grid>
                             </Grid>
@@ -292,17 +364,19 @@
                             <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiQuickPrompt_Click" Tag="Кратко и структурированно перескажи текущую страницу на русском языке. Выдели главные факты и выводы." Content="Пересказать" />
                             <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiQuickPrompt_Click" Tag="Объясни содержание текущей страницы простыми словами. Отдельно укажи важные детали и спорные утверждения." Content="Объяснить" />
                             <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiQuickPrompt_Click" Tag="Переведи содержимое текущей страницы на русский язык, сохраняя структуру и термины." Content="Перевести" />
-                            <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiQuickPrompt_Click" Tag="Проанализируй выделенный текст или код, найди ошибки и предложи конкретные исправления." Content="Разобрать код" />
-                            <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiFillPage_Click" Content="Подставить страницу" />
-                            <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiOpenFull_Click" Content="Открыть во вкладке" />
+                            <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiQuickPrompt_Click" Tag="Проанализируй выделенный текст или код, найди ошибки и предложи конкретные исправления." Content="Код" />
+                            <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiFillPage_Click" Content="Контекст" />
+                            <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiOpenFull_Click" Content="Во вкладке" />
                         </WrapPanel>
 
-                        <Border Grid.Row="3" Background="#FF0B0C0F" CornerRadius="18" ClipToBounds="True">
+                        <Border Grid.Row="3" Background="{DynamicResource ContentSurfaceBrush}"
+                                BorderBrush="{DynamicResource DividerBrush}" BorderThickness="1"
+                                CornerRadius="{DynamicResource ControlCornerRadius}" ClipToBounds="True">
                             <wv2:WebView2 x:Name="AiWebView" />
                         </Border>
-                        <TextBlock x:Name="AiStatus" Grid.Row="4" Margin="4,8,4,0"
-                                   Foreground="{DynamicResource MutedTextBrush}" FontSize="11"
-                                   Text="Выберите сервис и введите запрос" TextTrimming="CharacterEllipsis" />
+                        <TextBlock x:Name="AiStatus" Grid.Row="4" Margin="4,8,4,1"
+                                   MaxHeight="36" Foreground="{DynamicResource MutedTextBrush}" FontSize="11"
+                                   Text="Выберите сервис и введите запрос" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
                     </Grid>
                 </Grid>
             </Border>

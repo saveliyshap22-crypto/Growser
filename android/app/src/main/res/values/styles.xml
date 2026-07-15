@@ -5,11 +5,40 @@
         <item name="android:fontFamily">sans</item>
         <item name="android:windowActionModeOverlay">true</item>
         <item name="android:colorAccent">@color/chroma_accent</item>
+        <item name="android:colorControlActivated">@color/chroma_accent</item>
+        <item name="android:colorControlHighlight">@color/chroma_accent_soft</item>
+        <item name="android:textColorPrimary">@color/chroma_text</item>
+        <item name="android:textColorSecondary">@color/chroma_muted</item>
         <item name="android:navigationBarColor">@color/chroma_window</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
         <item name="android:windowBackground">@drawable/window_gradient</item>
         <item name="android:windowDisablePreview">true</item>
+        <item name="android:alertDialogTheme">@style/Theme.Chroma.Dialog</item>
+        <item name="android:panelColorBackground">@color/chroma_panel</item>
+        <item name="android:listPopupWindowStyle">@style/Widget.Chroma.ListPopup</item>
+        <item name="android:spinnerStyle">@style/Widget.Chroma.Spinner</item>
+    </style>
+
+    <style name="Theme.Chroma.Dialog" parent="android:style/Theme.Material.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/dialog_surface</item>
+        <item name="android:colorAccent">@color/chroma_accent</item>
+        <item name="android:colorControlActivated">@color/chroma_accent</item>
+        <item name="android:textColorPrimary">@color/chroma_text</item>
+        <item name="android:textColorSecondary">@color/chroma_muted</item>
+        <item name="android:windowMinWidthMajor">88%</item>
+        <item name="android:windowMinWidthMinor">88%</item>
+        <item name="android:windowNoTitle">false</item>
+    </style>
+
+    <style name="Widget.Chroma.ListPopup" parent="@android:style/Widget.Material.ListPopupWindow">
+        <item name="android:popupBackground">@drawable/dialog_surface</item>
+        <item name="android:dropDownVerticalOffset">4dp</item>
+    </style>
+
+    <style name="Widget.Chroma.Spinner" parent="@android:style/Widget.Material.Spinner.Underlined">
+        <item name="android:backgroundTint">@color/chroma_accent</item>
+        <item name="android:popupBackground">@drawable/dialog_surface</item>
     </style>
 </resources>

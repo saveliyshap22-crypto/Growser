@@ -9,7 +9,7 @@ on:
       version:
         description: "Version without v prefix"
         required: true
-        default: "0.5.0"
+        default: "0.6.0"
 
 permissions:
   contents: read
@@ -21,7 +21,7 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 50
     env:
-      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.5.0' }}
+      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.6.0' }}
 
     steps:
       - name: Checkout
@@ -94,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
-      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.5.0' }}
+      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.6.0' }}
 
     steps:
       - name: Checkout
@@ -153,7 +153,7 @@ jobs:
     permissions:
       contents: write
     env:
-      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.5.0' }}
+      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.6.0' }}
 
     steps:
       - name: Download verified packages
@@ -193,21 +193,19 @@ jobs:
           target_commitish: ${{ github.sha }}
           name: Chroma Browser ${{ env.RELEASE_TAG }}
           body: |
-            ## Chroma Browser 0.5.0
+            ## Chroma Browser 0.6.0
 
-            Большое обновление интерфейса, вкладок, кастомизации и AI-интеграции.
+            Полный аудит интерфейса, настроек, курсора, медиапанели и установщика.
 
-            - Вкладки автоматически уменьшаются под ширину окна, поддерживают горизонтальную прокрутку колёсиком и меню быстрого выбора всех вкладок.
-            - Добавлены плавные появления вкладок и страниц, более аккуратные активные состояния и исправлено обрезание длинных заголовков.
-            - Акцентный цвет теперь меняет кнопки, вкладки, границы, поля, подсветку, новую вкладку и элементы жидкого стекла.
-            - Настройки переработаны: плотность интерфейса, ширина вкладок, сила стекла, прозрачность, скругление, фоновые блики и кнопки закрытия.
-            - Новая вкладка получила адаптивные карточки закладок, часы, улучшенные анимации и исправления переполнения текста.
-            - AI-панель получила редактор запроса, шаблоны, добавление контекста страницы, копирование и вставку запроса прямо в поле выбранного AI-чата.
-            - Добавлены ChatGPT, Claude и Google Gemini вместе с уже доступными AI-сервисами.
-            - Установщик сохраняет настройки при обновлении, проверяет наличие WebView2, предлагает выбор браузера по умолчанию и получил улучшенное описание шагов.
-            - Усилена проверка релизных файлов, версий и контрольных сумм в CI.
-            - Windows и Android версии синхронизированы до 0.5.0.
-            - Windows: используйте Setup EXE или portable ZIP.
-            - Android: preview APK подписан временным CI-ключом и не предназначен для Google Play.
+            - Исправлены белые системные контекстные меню, выпадающие списки и несогласованные поверхности.
+            - Добавлены три формы интерфейса: скруглённая, сбалансированная и почти квадратная.
+            - Добавлены усиленное стекло, мягкое стекло и полностью непрозрачный режим без стекла.
+            - Добавлены системный курсор, белая точка с чёрной обводкой, чёрная точка с белой обводкой и радужная точка.
+            - Пользовательский курсор применяется к нативному WPF-интерфейсу и страницам WebView2.
+            - Добавлена отключаемая медиапанель слева от вкладок с названием, сайтом, паузой и управлением звуком.
+            - Улучшены вкладки, активные состояния, анимации, обрезание длинного текста, AI-панель и адаптация к узким окнам.
+            - Android получил синхронизированную графитово-оранжевую палитру, тёмные диалоги и обновлённые стеклянные поверхности.
+            - Установщик переработан в стиле Chroma и дополнительно проверяет WebView2, обновление поверх старой версии и целостность пакетов.
+            - Windows и Android версии синхронизированы до 0.6.0.
             - Для каждого пакета приложен SHA-256 файл.
           files: release-assets/*
