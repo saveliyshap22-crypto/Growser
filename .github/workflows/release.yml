@@ -9,7 +9,7 @@ on:
       version:
         description: "Version without v prefix"
         required: true
-        default: "0.3.2"
+        default: "0.4.0"
 
 permissions:
   contents: read
@@ -21,7 +21,7 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 50
     env:
-      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.3.2' }}
+      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.4.0' }}
 
     steps:
       - name: Checkout
@@ -79,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
-      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.3.2' }}
+      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.4.0' }}
 
     steps:
       - name: Checkout
@@ -136,7 +136,7 @@ jobs:
     permissions:
       contents: write
     env:
-      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.3.2' }}
+      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.4.0' }}
 
     steps:
       - name: Download verified packages
@@ -168,14 +168,18 @@ jobs:
           target_commitish: ${{ github.sha }}
           name: Chroma Browser ${{ env.RELEASE_TAG }}
           body: |
-            ## Chroma Browser 0.3.2
+            ## Chroma Browser 0.4.0
 
-            Исправление запуска Windows-версии.
+            Крупное обновление дизайна и поиска.
 
-            - Исправлен некорректный WPF-цвет `#321FFFFFFF`, вызывавший `FormatException: Недопустимый маркер` при создании главного окна.
-            - Цвет фона вкладки заменён на корректный ARGB-маркер `#32FFFFFF`.
-            - Добавлен тест, проверяющий допустимую длину всех шестнадцатеричных цветов во всех XAML-файлах.
-            - Windows и Android версии синхронизированы до 0.3.2.
+            - Добавлен Dork Studio на новой вкладке: тип поиска по фразе, нику, номеру, сайту, заголовку или URL.
+            - Добавлен выбор формата результата: все файлы, PDF, DOCX, XLSX, PPTX или TXT.
+            - Доступны ограничение по сайту, дополнительные и исключаемые слова, точное совпадение, предпросмотр и копирование запроса.
+            - Готовый запрос можно открыть в Google, Bing или DuckDuckGo.
+            - Настройка акцентного цвета заменена визуальной палитрой без ручного ввода HEX-кода.
+            - Интерфейс Windows и новая вкладка получили обновлённый графитово-оранжевый дизайн.
+            - Добавлен runtime-тест запуска MainWindow, который ловит ошибки XAML и некорректные Brush-маркеры до выпуска.
+            - Windows и Android версии синхронизированы до 0.4.0.
             - Windows: используйте Setup EXE или portable ZIP.
             - Android: preview APK подписан временным CI-ключом и не предназначен для Google Play.
             - Для каждого пакета приложен SHA-256 файл.
