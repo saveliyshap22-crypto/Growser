@@ -1,6 +1,6 @@
 using System.Globalization;
 using System.Windows;
-using System.Windows.Media;
+using System.Windows.Controls;
 using Chroma.Browser.Models;
 using Microsoft.Win32;
 
@@ -24,7 +24,10 @@ public partial class SettingsWindow : Window
 
         ThemeBox.ItemsSource = Enum.GetValues<ThemeMode>();
         ThemeBox.SelectedItem = settings.Theme;
-        AccentBox.Text = settings.AccentColor;
+        AccentPalette.SelectedItem = AccentPalette.Items
+            .OfType<ListBoxItem>()
+            .FirstOrDefault(item => string.Equals(item.Tag as string, settings.AccentColor, StringComparison.OrdinalIgnoreCase))
+            ?? AccentPalette.Items.OfType<ListBoxItem>().First();
         OpacitySlider.Value = settings.InterfaceOpacity;
         MicaCheck.IsChecked = settings.UseMica;
         ReduceMotionCheck.IsChecked = settings.ReduceMotion;
@@ -50,16 +53,9 @@ public partial class SettingsWindow : Window
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
-        try
+        if (AccentPalette.SelectedItem is not ListBoxItem { Tag: string accent })
         {
-            if (ColorConverter.ConvertFromString(AccentBox.Text) is not Color)
-            {
-                throw new FormatException("Invalid color");
-            }
-        }
-        catch (FormatException)
-        {
-            MessageBox.Show("Цвет акцента должен быть записан как #RRGGBB.", "Настройки", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("Выберите цвет акцента из палитры.", "Настройки", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -70,7 +66,7 @@ public partial class SettingsWindow : Window
         }
 
         _settings.Theme = ThemeBox.SelectedItem is ThemeMode theme ? theme : ThemeMode.System;
-        _settings.AccentColor = AccentBox.Text.Trim();
+        _settings.AccentColor = accent;
         _settings.InterfaceOpacity = OpacitySlider.Value;
         _settings.UseMica = MicaCheck.IsChecked == true;
         _settings.ReduceMotion = ReduceMotionCheck.IsChecked == true;
