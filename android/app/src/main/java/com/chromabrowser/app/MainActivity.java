@@ -30,6 +30,7 @@ import android.webkit.PermissionRequest;
 import android.webkit.RenderProcessGoneDetail;
 import android.webkit.SafeBrowsingResponse;
 import android.webkit.SslErrorHandler;
+import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -38,7 +39,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.webkit.URLUtil;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -54,8 +54,8 @@ import android.widget.Toast;
 import org.json.JSONTokener;
 
 import java.io.ByteArrayInputStream;
-import java.net.URLEncoder;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -84,11 +84,11 @@ public class MainActivity extends Activity {
     private static final int MENU_DESKTOP = 9;
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_CLEAR = 11;
+    private static final int MENU_TOGGLE_BOOKMARK = 12;
 
     private final List<BrowserTab> tabs = new ArrayList<>();
     private final Map<String, String> aiProviders = new LinkedHashMap<>();
     private int selectedTab = -1;
-    private boolean updatingAddress;
     private boolean aiConfigured;
     private ValueCallback<Uri[]> fileChooserCallback;
     private PermissionRequest pendingWebPermission;
@@ -108,6 +108,10 @@ public class MainActivity extends Activity {
     private Button forwardButton;
     private Button reloadButton;
     private Button bookmarkButton;
+    private Button homeButton;
+    private Button tabsButton;
+    private Button aiButton;
+    private Button bottomMenuButton;
     private TextView privateBadge;
     private WebView aiWebView;
     private Spinner aiProvider;
@@ -145,8 +149,7 @@ public class MainActivity extends Activity {
         if (incoming != null && isWebScheme(incoming.getScheme())) {
             addTab(incoming.toString(), true);
         } else if (!isPrivateMode()) {
-            List<String> restored = store.restoreSession();
-            for (String url : restored) {
+            for (String url : store.restoreSession()) {
                 addTab(url, false);
             }
             if (!tabs.isEmpty()) {
@@ -173,6 +176,10 @@ public class MainActivity extends Activity {
         forwardButton = findViewById(R.id.forwardButton);
         reloadButton = findViewById(R.id.reloadButton);
         bookmarkButton = findViewById(R.id.bookmarkButton);
+        homeButton = findViewById(R.id.homeButton);
+        tabsButton = findViewById(R.id.tabsButton);
+        aiButton = findViewById(R.id.aiButton);
+        bottomMenuButton = findViewById(R.id.bottomMenuButton);
         privateBadge = findViewById(R.id.privateBadge);
         aiWebView = findViewById(R.id.aiWebView);
         aiProvider = findViewById(R.id.aiProvider);
@@ -199,13 +206,18 @@ public class MainActivity extends Activity {
                 tab.webView.reload();
             }
         });
+
         View.OnClickListener menuListener = this::showMainMenu;
         findViewById(R.id.menuButton).setOnClickListener(menuListener);
-        findViewById(R.id.bottomMenuButton).setOnClickListener(menuListener);
-        findViewById(R.id.homeButton).setOnClickListener(view -> loadAddress(UrlResolver.NEW_TAB));
-        bookmarkButton.setOnClickListener(view -> toggleBookmark());
-        findViewById(R.id.aiButton).setOnClickListener(view -> showAiSheet());
-        findViewById(R.id.tabsButton).setOnClickListener(view -> showTabsDialog());
+        bottomMenuButton.setOnClickListener(menuListener);
+        homeButton.setOnClickListener(view -> loadAddress(UrlResolver.NEW_TAB));
+        tabsButton.setOnClickListener(view -> showTabsDialog());
+        bookmarkButton.setOnClickListener(view -> showEntries("Закладки", store.bookmarks(), false));
+        bookmarkButton.setOnLongClickListener(view -> {
+            toggleBookmark();
+            return true;
+        });
+        aiButton.setOnClickListener(view -> showAiSheet());
         findViewById(R.id.aiCloseButton).setOnClickListener(view -> hideAiSheet());
         findViewById(R.id.aiSummarize).setOnClickListener(view -> prepareAiPrompt("Кратко перескажи эту страницу по-русски, выделив основные факты:"));
         findViewById(R.id.aiExplain).setOnClickListener(view -> prepareAiPrompt("Объясни содержимое простыми словами по-русски:"));
@@ -263,7 +275,7 @@ public class MainActivity extends Activity {
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         settings.setSafeBrowsingEnabled(true);
         settings.setGeolocationEnabled(true);
-        settings.setUserAgentString(WebSettings.getDefaultUserAgent(this) + " ChromaBrowser/0.2");
+        settings.setUserAgentString(WebSettings.getDefaultUserAgent(this) + " ChromaBrowser/0.3");
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView,
             store != null && store.preferences().getBoolean("third_party_cookies", false));
         webView.setWebViewClient(new ChromaWebViewClient(tab));
@@ -360,9 +372,7 @@ public class MainActivity extends Activity {
             params.setMarginEnd(dp(5));
             chip.setLayoutParams(params);
             int capturedIndex = index;
-            chip.setOnClickListener(view -> {
-                selectTab(capturedIndex);
-            });
+            chip.setOnClickListener(view -> selectTab(capturedIndex));
             chip.setOnLongClickListener(view -> {
                 PopupMenu menu = new PopupMenu(this, chip);
                 menu.getMenu().add("Закрыть вкладку").setOnMenuItemClickListener(item -> {
@@ -383,13 +393,22 @@ public class MainActivity extends Activity {
     private void updateNavigationUi(BrowserTab tab) {
         String url = tab.webView.getUrl();
         String shown = isInternalUrl(url) ? "" : url;
-        updatingAddress = true;
         addressBar.setText(shown == null ? "" : shown);
-        updatingAddress = false;
         backButton.setEnabled(tab.webView.canGoBack());
         forwardButton.setEnabled(tab.webView.canGoForward());
         boolean bookmarked = shown != null && !shown.trim().isEmpty() && store.isBookmarked(shown);
-        bookmarkButton.setText(bookmarked ? "★\nЗакладка" : "☆\nЗакладка");
+        bookmarkButton.setText(bookmarked ? "★\nЗакладки" : "☆\nЗакладки");
+        setBottomNavigationState(isInternalUrl(url) ? homeButton : null);
+    }
+
+    private void setBottomNavigationState(Button active) {
+        int normal = Color.rgb(245, 247, 250);
+        int accent = Color.rgb(174, 184, 255);
+        homeButton.setTextColor(active == homeButton ? accent : normal);
+        tabsButton.setTextColor(active == tabsButton ? accent : normal);
+        bookmarkButton.setTextColor(active == bookmarkButton ? accent : normal);
+        aiButton.setTextColor(active == aiButton ? accent : normal);
+        bottomMenuButton.setTextColor(active == bottomMenuButton ? accent : normal);
     }
 
     private void toggleBookmark() {
@@ -400,6 +419,7 @@ public class MainActivity extends Activity {
         }
         String url = tab.webView.getUrl();
         if (isInternalUrl(url)) {
+            Toast.makeText(this, "Откройте сайт, чтобы добавить его в закладки", Toast.LENGTH_SHORT).show();
             return;
         }
         boolean added = store.toggleBookmark(tab.title, url);
@@ -408,21 +428,29 @@ public class MainActivity extends Activity {
     }
 
     private void showMainMenu(View anchor) {
+        setBottomNavigationState(bottomMenuButton);
         PopupMenu popup = new PopupMenu(this, anchor);
         popup.getMenu().add(0, MENU_NEW_TAB, 0, "Новая вкладка");
         popup.getMenu().add(0, MENU_PRIVATE, 1, "Новая вкладка инкогнито");
-        popup.getMenu().add(0, MENU_BOOKMARKS, 2, "Закладки");
-        popup.getMenu().add(0, MENU_HISTORY, 3, "История");
-        popup.getMenu().add(0, MENU_DOWNLOADS, 4, "Загрузки");
-        popup.getMenu().add(0, MENU_FIND, 5, "Найти на странице");
-        popup.getMenu().add(0, MENU_SHARE, 6, "Поделиться");
-        popup.getMenu().add(0, MENU_TRANSLATE, 7, "Перевести страницу");
+        popup.getMenu().add(0, MENU_TOGGLE_BOOKMARK, 2, "Добавить или убрать закладку");
+        popup.getMenu().add(0, MENU_BOOKMARKS, 3, "Закладки");
+        popup.getMenu().add(0, MENU_HISTORY, 4, "История");
+        popup.getMenu().add(0, MENU_DOWNLOADS, 5, "Загрузки");
+        popup.getMenu().add(0, MENU_FIND, 6, "Найти на странице");
+        popup.getMenu().add(0, MENU_SHARE, 7, "Поделиться");
+        popup.getMenu().add(0, MENU_TRANSLATE, 8, "Перевести страницу");
         BrowserTab current = currentTab();
-        popup.getMenu().add(0, MENU_DESKTOP, 8,
+        popup.getMenu().add(0, MENU_DESKTOP, 9,
             current != null && current.desktopMode ? "Мобильная версия сайта" : "Версия для ПК");
-        popup.getMenu().add(0, MENU_SETTINGS, 9, "Настройки");
-        popup.getMenu().add(0, MENU_CLEAR, 10, "Очистить данные просмотра");
+        popup.getMenu().add(0, MENU_SETTINGS, 10, "Настройки");
+        popup.getMenu().add(0, MENU_CLEAR, 11, "Очистить данные просмотра");
         popup.setOnMenuItemClickListener(this::handleMenuItem);
+        popup.setOnDismissListener(menu -> {
+            BrowserTab tab = currentTab();
+            if (tab != null) {
+                updateNavigationUi(tab);
+            }
+        });
         popup.show();
     }
 
@@ -430,6 +458,7 @@ public class MainActivity extends Activity {
         switch (item.getItemId()) {
             case MENU_NEW_TAB -> addTab(UrlResolver.NEW_TAB, true);
             case MENU_PRIVATE -> startActivity(new Intent(this, PrivateActivity.class));
+            case MENU_TOGGLE_BOOKMARK -> toggleBookmark();
             case MENU_BOOKMARKS -> showEntries("Закладки", store.bookmarks(), false);
             case MENU_HISTORY -> showEntries("История", store.history(), true);
             case MENU_DOWNLOADS -> startActivity(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS));
@@ -447,22 +476,27 @@ public class MainActivity extends Activity {
     }
 
     private void showTabsDialog() {
+        setBottomNavigationState(tabsButton);
         String[] labels = new String[tabs.size()];
         for (int index = 0; index < tabs.size(); index++) {
             labels[index] = (index == selectedTab ? "● " : "○ ") + tabs.get(index).title;
         }
-        new AlertDialog.Builder(this)
+        AlertDialog dialog = new AlertDialog.Builder(this)
             .setTitle("Вкладки — " + tabs.size())
-            .setItems(labels, (dialog, which) -> selectTab(which))
-            .setNeutralButton("Закрыть текущую", (dialog, which) -> closeTab(selectedTab))
-            .setPositiveButton("Новая", (dialog, which) -> addTab(UrlResolver.NEW_TAB, true))
+            .setItems(labels, (ignored, which) -> selectTab(which))
+            .setNeutralButton("Закрыть текущую", (ignored, which) -> closeTab(selectedTab))
+            .setPositiveButton("Новая", (ignored, which) -> addTab(UrlResolver.NEW_TAB, true))
             .setNegativeButton("Готово", null)
-            .show();
+            .create();
+        dialog.setOnDismissListener(ignored -> updateNavigationUi(currentTab()));
+        dialog.show();
     }
 
     private void showEntries(String title, List<BrowserStore.Entry> entries, boolean history) {
+        setBottomNavigationState(bookmarkButton);
         if (entries.isEmpty()) {
             Toast.makeText(this, title + ": пока пусто", Toast.LENGTH_SHORT).show();
+            updateNavigationUi(currentTab());
             return;
         }
         String[] labels = new String[entries.size()];
@@ -473,18 +507,14 @@ public class MainActivity extends Activity {
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
             .setTitle(title)
-            .setItems(labels, (dialog, which) -> {
-                if (tabs.isEmpty()) {
-                    addTab(entries.get(which).url, true);
-                } else {
-                    loadAddress(entries.get(which).url);
-                }
-            })
+            .setItems(labels, (dialog, which) -> loadAddress(entries.get(which).url))
             .setNegativeButton("Закрыть", null);
         if (history) {
             builder.setNeutralButton("Очистить", (dialog, which) -> store.clearHistory());
         }
-        builder.show();
+        AlertDialog dialog = builder.create();
+        dialog.setOnDismissListener(ignored -> updateNavigationUi(currentTab()));
+        dialog.show();
     }
 
     private void showFindDialog() {
@@ -527,13 +557,12 @@ public class MainActivity extends Activity {
         if (tab == null || isInternalUrl(tab.webView.getUrl())) {
             return;
         }
-        String encoded;
         try {
-            encoded = URLEncoder.encode(tab.webView.getUrl(), "UTF-8");
+            String encoded = URLEncoder.encode(tab.webView.getUrl(), "UTF-8");
+            navigate(tab, "https://translate.google.com/translate?sl=auto&tl=ru&u=" + encoded);
         } catch (UnsupportedEncodingException impossible) {
-            encoded = tab.webView.getUrl();
+            navigate(tab, tab.webView.getUrl());
         }
-        navigate(tab, "https://translate.google.com/translate?sl=auto&tl=ru&u=" + encoded);
     }
 
     private void toggleDesktopMode() {
@@ -544,8 +573,8 @@ public class MainActivity extends Activity {
         tab.desktopMode = !tab.desktopMode;
         String agent = tab.desktopMode
             ? "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-              "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 ChromaBrowser/0.2"
-            : WebSettings.getDefaultUserAgent(this) + " ChromaBrowser/0.2";
+              "(KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 ChromaBrowser/0.3"
+            : WebSettings.getDefaultUserAgent(this) + " ChromaBrowser/0.3";
         tab.webView.getSettings().setUserAgentString(agent);
         tab.webView.reload();
     }
@@ -589,6 +618,10 @@ public class MainActivity extends Activity {
                 for (BrowserTab tab : tabs) {
                     CookieManager.getInstance().setAcceptThirdPartyCookies(tab.webView, cookies.isChecked());
                 }
+                BrowserTab tab = currentTab();
+                if (tab != null && isInternalUrl(tab.webView.getUrl())) {
+                    navigate(tab, UrlResolver.NEW_TAB);
+                }
             })
             .setNegativeButton("Отмена", null)
             .show();
@@ -621,6 +654,7 @@ public class MainActivity extends Activity {
     }
 
     private void showAiSheet() {
+        setBottomNavigationState(aiButton);
         if (!aiConfigured) {
             configureAi();
         }
@@ -634,7 +668,10 @@ public class MainActivity extends Activity {
 
     private void hideAiSheet() {
         aiSheet.animate().translationY(aiSheet.getHeight()).setDuration(200)
-            .withEndAction(() -> aiSheet.setVisibility(View.GONE)).start();
+            .withEndAction(() -> {
+                aiSheet.setVisibility(View.GONE);
+                updateNavigationUi(currentTab());
+            }).start();
     }
 
     private void configureAi() {
@@ -665,16 +702,13 @@ public class MainActivity extends Activity {
         settings.setSafeBrowsingEnabled(true);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         settings.setMediaPlaybackRequiresUserGesture(true);
-        settings.setUserAgentString(WebSettings.getDefaultUserAgent(this) + " ChromaBrowserAI/0.2");
+        settings.setUserAgentString(WebSettings.getDefaultUserAgent(this) + " ChromaBrowserAI/0.3");
         CookieManager.getInstance().setAcceptThirdPartyCookies(aiWebView, true);
         aiWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
-                if (isWebScheme(uri.getScheme())) {
-                    return false;
-                }
-                return openExternal(uri);
+                return !isWebScheme(uri.getScheme()) && openExternal(uri);
             }
         });
         aiWebView.setWebChromeClient(new WebChromeClient());
@@ -691,7 +725,7 @@ public class MainActivity extends Activity {
         String script = "(function(){const s=String(window.getSelection());" +
             "const t=s.trim()?s:document.body.innerText;return t.slice(0,12000);})()";
         tab.webView.evaluateJavascript(script, raw -> {
-            String text = "";
+            String text;
             try {
                 Object decoded = new JSONTokener(raw).nextValue();
                 text = decoded == null ? "" : decoded.toString();
@@ -727,165 +761,35 @@ public class MainActivity extends Activity {
             request.setMimeType(pending.mimeType);
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name);
-            request.addRequestHeader("User-Agent", pending.userAgent == null ? "ChromaBrowser/0.2" : pending.userAgent);
+            request.addRequestHeader("User-Agent", pending.userAgent == null ? "ChromaBrowser/0.3" : pending.userAgent);
             String cookies = CookieManager.getInstance().getCookie(pending.url);
             if (cookies != null) {
                 request.addRequestHeader("Cookie", cookies);
             }
-            DownloadManager manager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-            manager.enqueue(request);
-            Toast.makeText(this, "Загрузка началась: " + name, Toast.LENGTH_LONG).show();
-        } catch (RuntimeException exception) {
+            ((DownloadManager) getSystemService(DOWNLOAD_SERVICE)).enqueue(request);
+            Toast.makeText(this, "Загрузка началась", Toast.LENGTH_SHORT).show();
+        } catch (Exception exception) {
             Toast.makeText(this, "Не удалось начать загрузку", Toast.LENGTH_LONG).show();
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        boolean granted = grantResults.length > 0;
-        for (int result : grantResults) {
-            granted &= result == PackageManager.PERMISSION_GRANTED;
-        }
-        if (requestCode == WEB_PERMISSION_REQUEST && pendingWebPermission != null) {
-            if (granted) {
-                pendingWebPermission.grant(pendingWebPermission.getResources());
-            } else {
-                pendingWebPermission.deny();
-            }
-            pendingWebPermission = null;
-        } else if (requestCode == GEOLOCATION_PERMISSION_REQUEST && pendingGeolocationCallback != null) {
-            boolean locationGranted = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-            pendingGeolocationCallback.invoke(pendingGeolocationOrigin, locationGranted, false);
-            pendingGeolocationCallback = null;
-            pendingGeolocationOrigin = null;
-        } else if (requestCode == STORAGE_PERMISSION_REQUEST && pendingDownload != null) {
-            if (granted) {
-                startDownload(pendingDownload);
-            }
-            pendingDownload = null;
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == FILE_CHOOSER_REQUEST && fileChooserCallback != null) {
-            Uri[] result = WebChromeClient.FileChooserParams.parseResult(resultCode, data);
-            fileChooserCallback.onReceiveValue(result);
-            fileChooserCallback = null;
-        }
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setIntent(intent);
-        Uri data = intent.getData();
-        if (data != null && isWebScheme(data.getScheme())) {
-            addTab(data.toString(), true);
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (customView != null) {
-            hideCustomView();
-            return;
-        }
-        if (aiSheet.getVisibility() == View.VISIBLE) {
-            hideAiSheet();
-            return;
-        }
-        BrowserTab tab = currentTab();
-        if (tab != null && tab.webView.canGoBack()) {
-            tab.webView.goBack();
-            return;
-        }
-        super.onBackPressed();
-    }
-
-    @Override
-    protected void onPause() {
-        BrowserTab tab = currentTab();
-        if (tab != null) {
-            tab.webView.onPause();
-        }
-        saveSession();
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        BrowserTab tab = currentTab();
-        if (tab != null) {
-            tab.webView.onResume();
-        }
-    }
-
-    @Override
-    public void onTrimMemory(int level) {
-        super.onTrimMemory(level);
-        if (level >= TRIM_MEMORY_RUNNING_LOW) {
-            for (int index = 0; index < tabs.size(); index++) {
-                if (index != selectedTab) {
-                    tabs.get(index).webView.clearCache(false);
-                    tabs.get(index).webView.onPause();
-                }
-            }
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        saveSession();
-        for (BrowserTab tab : tabs) {
-            tab.webView.stopLoading();
-            tab.webView.removeAllViews();
-            tab.webView.destroy();
-        }
-        tabs.clear();
-        if (aiConfigured) {
-            aiWebView.stopLoading();
-            aiWebView.removeAllViews();
-            aiWebView.destroy();
-        }
-        if (isPrivateMode()) {
-            CookieManager.getInstance().removeAllCookies(null);
-            CookieManager.getInstance().flush();
-            WebStorage.getInstance().deleteAllData();
-        }
-        super.onDestroy();
-    }
-
-    private void saveSession() {
-        List<String> urls = new ArrayList<>();
-        for (BrowserTab tab : tabs) {
-            String url = tab.webView.getUrl();
-            urls.add(isInternalUrl(url) ? UrlResolver.NEW_TAB : url);
-        }
-        store.saveSession(urls, selectedTab);
-    }
-
     private void grantWebPermission(PermissionRequest request) {
-        List<String> needed = new ArrayList<>();
+        List<String> androidPermissions = new ArrayList<>();
         for (String resource : request.getResources()) {
             if (PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource) &&
                 checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                needed.add(Manifest.permission.CAMERA);
+                androidPermissions.add(Manifest.permission.CAMERA);
             }
             if (PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(resource) &&
                 checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                needed.add(Manifest.permission.RECORD_AUDIO);
+                androidPermissions.add(Manifest.permission.RECORD_AUDIO);
             }
         }
-        if (needed.isEmpty()) {
+        if (androidPermissions.isEmpty()) {
             request.grant(request.getResources());
         } else {
             pendingWebPermission = request;
-            requestPermissions(needed.toArray(new String[0]), WEB_PERMISSION_REQUEST);
+            requestPermissions(androidPermissions.toArray(new String[0]), WEB_PERMISSION_REQUEST);
         }
     }
 
@@ -950,21 +854,42 @@ public class MainActivity extends Activity {
     }
 
     private String newTabHtml() {
+        String template = searchTemplate();
+        int markerIndex = template.indexOf("%s");
+        String prefix = markerIndex >= 0 ? template.substring(0, markerIndex) : template;
+        int questionIndex = prefix.indexOf('?');
+        String action = questionIndex >= 0 ? prefix.substring(0, questionIndex) : prefix;
+        int parameterStart = Math.max(prefix.lastIndexOf('?'), prefix.lastIndexOf('&'));
+        String parameter = parameterStart >= 0 ? prefix.substring(parameterStart + 1) : "q=";
+        int equalsIndex = parameter.indexOf('=');
+        String queryName = equalsIndex > 0 ? parameter.substring(0, equalsIndex) : "q";
+        String subtitle = isPrivateMode()
+            ? "Приватная сессия: история и данные просмотра не сохраняются."
+            : "Введите запрос — результаты откроются в выбранной поисковой системе.";
+
         return """
-            <!doctype html><html lang=\"ru\"><head><meta charset=\"utf-8\">
-            <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">
-            <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; style-src 'unsafe-inline'; img-src data:;\">
+            <!doctype html><html lang="ru"><head><meta charset="utf-8">
+            <meta name="viewport" content="width=device-width,initial-scale=1">
+            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; form-action https:; navigate-to https: http:">
             <style>
-            :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;
-            font-family:system-ui,sans-serif;color:#f5f7fa;background:radial-gradient(circle at 25% 10%,#343a48 0,#171a21 33%,#0d0f13 100%)}
-            main{width:min(88vw,720px);padding:38px;border:1px solid #ffffff30;border-radius:34px;background:#242831b8;
-            box-shadow:0 24px 70px #0008;backdrop-filter:blur(26px)}h1{font-size:clamp(32px,8vw,68px);margin:0 0 8px;letter-spacing:-.05em}
-            p{color:#adb3bd;margin:0 0 28px}.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
-            a{padding:17px 14px;border-radius:22px;color:#f5f7fa;text-decoration:none;text-align:center;background:#ffffff12;border:1px solid #ffffff20}
-            a:active{background:#aeb8ff38}</style></head><body><main><h1>Chroma</h1><p>Быстрый приватный браузер</p>
-            <div class=\"links\"><a href=\"https://google.com\">Google</a><a href=\"https://youtube.com\">YouTube</a>
-            <a href=\"https://github.com\">GitHub</a><a href=\"https://chat.mistral.ai\">Mistral AI</a></div></main></body></html>
-            """;
+            :root{color-scheme:dark;font-family:system-ui,-apple-system,sans-serif}*{box-sizing:border-box}
+            body{margin:0;min-height:100vh;overflow:hidden;color:#f7f8fb;background:radial-gradient(circle at 18% 18%,#aeb8ff30,transparent 31%),radial-gradient(circle at 82% 72%,#d7dbff1f,transparent 38%),linear-gradient(145deg,#101218,#252a35 52%,#111318)}
+            main{min-height:100vh;width:min(92vw,760px);margin:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:34px 0 88px}
+            h1{margin:0 0 28px;font-size:clamp(42px,13vw,72px);line-height:1;font-weight:750;letter-spacing:-.065em;text-shadow:0 16px 42px #000a}h1 span{color:#cbd1ff}
+            form{width:100%;height:68px;display:flex;align-items:center;gap:10px;padding:0 10px 0 22px;border:1px solid #ffffff3d;border-radius:999px;background:linear-gradient(145deg,#ffffff24,#ffffff0d);box-shadow:0 28px 82px #0009,inset 0 1px 0 #ffffff42;backdrop-filter:blur(30px)}
+            .icon{font-size:22px;color:#c7ccd6}input{min-width:0;flex:1;border:0;outline:0;background:transparent;color:#fff;font-size:17px;font-weight:500}input::placeholder{color:#b9bec8}
+            button{width:48px;height:48px;flex:0 0 48px;border:0;border-radius:999px;background:#d9ddff;color:#17191f;font-size:22px;font-weight:800}p{max-width:620px;margin:17px 20px 0;text-align:center;color:#adb3be;font-size:13px;line-height:1.5}
+            </style></head><body><main><h1>Chroma <span>Browser</span></h1>
+            <form action="%s" method="get"><span class="icon">⌕</span><input name="%s" autofocus autocomplete="off" enterkeyhint="search" placeholder="Поиск в интернете"><button type="submit" aria-label="Найти">→</button></form>
+            <p>%s</p></main></body></html>
+            """.formatted(escapeHtml(action), escapeHtml(queryName), escapeHtml(subtitle));
+    }
+
+    private static String escapeHtml(String value) {
+        return value.replace("&", "&amp;")
+            .replace("\"", "&quot;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;");
     }
 
     private static boolean isInternalUrl(String url) {
@@ -989,6 +914,102 @@ public class MainActivity extends Activity {
         return Math.round(value * getResources().getDisplayMetrics().density);
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        Uri uri = intent.getData();
+        if (uri != null && isWebScheme(uri.getScheme())) {
+            loadAddress(uri.toString());
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (!isPrivateMode()) {
+            List<String> urls = new ArrayList<>();
+            for (BrowserTab tab : tabs) {
+                String url = tab.webView.getUrl();
+                urls.add(isInternalUrl(url) ? UrlResolver.NEW_TAB : url);
+            }
+            store.saveSession(urls, selectedTab);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        hideCustomView();
+        for (BrowserTab tab : tabs) {
+            tab.webView.stopLoading();
+            tab.webView.destroy();
+        }
+        tabs.clear();
+        if (aiConfigured) {
+            aiWebView.stopLoading();
+            aiWebView.destroy();
+        }
+        if (isPrivateMode()) {
+            CookieManager.getInstance().removeAllCookies(null);
+            WebStorage.getInstance().deleteAllData();
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (customView != null) {
+            hideCustomView();
+            return;
+        }
+        if (aiSheet.getVisibility() == View.VISIBLE) {
+            hideAiSheet();
+            return;
+        }
+        BrowserTab tab = currentTab();
+        if (tab != null && tab.webView.canGoBack()) {
+            tab.webView.goBack();
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == FILE_CHOOSER_REQUEST && fileChooserCallback != null) {
+            Uri[] result = WebChromeClient.FileChooserParams.parseResult(resultCode, data);
+            fileChooserCallback.onReceiveValue(result);
+            fileChooserCallback = null;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        boolean granted = grantResults.length > 0;
+        for (int result : grantResults) {
+            granted &= result == PackageManager.PERMISSION_GRANTED;
+        }
+        if (requestCode == WEB_PERMISSION_REQUEST && pendingWebPermission != null) {
+            if (granted) {
+                pendingWebPermission.grant(pendingWebPermission.getResources());
+            } else {
+                pendingWebPermission.deny();
+            }
+            pendingWebPermission = null;
+        } else if (requestCode == GEOLOCATION_PERMISSION_REQUEST && pendingGeolocationCallback != null) {
+            pendingGeolocationCallback.invoke(pendingGeolocationOrigin, granted, false);
+            pendingGeolocationCallback = null;
+            pendingGeolocationOrigin = null;
+        } else if (requestCode == STORAGE_PERMISSION_REQUEST && pendingDownload != null) {
+            if (granted) {
+                startDownload(pendingDownload);
+            }
+            pendingDownload = null;
+        }
+    }
+
     private final class ChromaWebViewClient extends WebViewClient {
         private final BrowserTab tab;
 
@@ -999,10 +1020,7 @@ public class MainActivity extends Activity {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
             Uri uri = request.getUrl();
-            if (isWebScheme(uri.getScheme())) {
-                return false;
-            }
-            return openExternal(uri);
+            return !isWebScheme(uri.getScheme()) && openExternal(uri);
         }
 
         @Override
@@ -1034,7 +1052,7 @@ public class MainActivity extends Activity {
             }
             store.addHistory(tab.title, url);
             rebuildTabBar();
-            if (store.preferences().getBoolean("adblock", true)) {
+            if (store.preferences().getBoolean("adblock", true) && !isInternalUrl(url)) {
                 view.evaluateJavascript("(function(){const s=document.createElement('style');s.textContent='" +
                     "[class*=\\\"ad-container\\\"],[id^=\\\"google_ads\\\"],.adsbygoogle{display:none!important}';" +
                     "document.documentElement.appendChild(s)})()", null);
@@ -1060,15 +1078,10 @@ public class MainActivity extends Activity {
         @Override
         public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
             int index = tabs.indexOf(tab);
+            String url = view.getUrl();
             if (index >= 0) {
-                String url = view.getUrl();
-                boolean wasLast = tabs.size() == 1;
                 closeTab(index);
-                if (wasLast) {
-                    loadAddress(url == null ? UrlResolver.NEW_TAB : url);
-                } else {
-                    addTab(url == null ? UrlResolver.NEW_TAB : url, true);
-                }
+                addTab(url == null ? UrlResolver.NEW_TAB : url, true);
             }
             Toast.makeText(MainActivity.this, "Процесс страницы восстановлен", Toast.LENGTH_LONG).show();
             return true;
