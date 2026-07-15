@@ -6,16 +6,28 @@ namespace Chroma.Browser.Tests;
 public sealed class NewTabPageServiceTests
 {
     [Fact]
-    public void BookmarkTextIsHtmlEncoded()
+    public void HomePageDoesNotExposeBookmarkShortcuts()
     {
         var page = NewTabPageService.Build(
             new AppSettings(),
-            [new BookmarkEntry { Title = "<script>alert(1)</script>", Url = "https://example.com/?a=1&b=2" }],
+            [new BookmarkEntry { Title = "Private bookmark", Url = "https://example.com/private" }],
             false);
 
-        Assert.DoesNotContain("<script>alert(1)</script>", page, StringComparison.Ordinal);
-        Assert.Contains("&lt;script&gt;", page, StringComparison.Ordinal);
-        Assert.Contains("https://example.com/?a=1&amp;b=2", page, StringComparison.Ordinal);
+        Assert.DoesNotContain("Private bookmark", page, StringComparison.Ordinal);
+        Assert.DoesNotContain("https://example.com/private", page, StringComparison.Ordinal);
+        Assert.Contains("Поиск в интернете", page, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void SearchFormUsesConfiguredQueryParameter()
+    {
+        var page = NewTabPageService.Build(
+            new AppSettings { SearchUrlTemplate = "https://yandex.ru/search/?text={0}" },
+            [],
+            false);
+
+        Assert.Contains("action=\"https://yandex.ru/search/\"", page, StringComparison.Ordinal);
+        Assert.Contains("name=\"text\"", page, StringComparison.Ordinal);
     }
 
     [Fact]
