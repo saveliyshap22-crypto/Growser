@@ -7,12 +7,30 @@ public enum ThemeMode
     Light
 }
 
+public enum InterfaceDensity
+{
+    Comfortable,
+    Compact
+}
+
+public enum TabWidthMode
+{
+    Adaptive,
+    Compact,
+    Wide
+}
+
 public sealed class AppSettings
 {
     public ThemeMode Theme { get; set; } = ThemeMode.System;
     public string AccentColor { get; set; } = "#FF8A3D";
-    public double InterfaceOpacity { get; set; } = 0.92;
-    public double CornerRadius { get; set; } = 14;
+    public double InterfaceOpacity { get; set; } = 0.94;
+    public double GlassIntensity { get; set; } = 0.78;
+    public double CornerRadius { get; set; } = 18;
+    public InterfaceDensity InterfaceDensity { get; set; } = InterfaceDensity.Comfortable;
+    public TabWidthMode TabWidthMode { get; set; } = TabWidthMode.Adaptive;
+    public bool ShowTabCloseButtons { get; set; } = true;
+    public bool ShowAmbientGlow { get; set; } = true;
     public bool UseMica { get; set; } = true;
     public bool ReduceMotion { get; set; }
     public bool RestoreSession { get; set; } = true;
@@ -34,9 +52,10 @@ public sealed class AppSettings
     public bool AskDownloadLocation { get; set; }
     public bool AutoCheckUpdates { get; set; } = true;
     public string NewTabWallpaperPath { get; set; } = string.Empty;
-    public string AiProviderId { get; set; } = "mistral";
-    public double AiPanelWidth { get; set; } = 410;
+    public string AiProviderId { get; set; } = "chatgpt";
+    public double AiPanelWidth { get; set; } = 430;
     public bool AiPanelVisible { get; set; }
+    public bool AiIncludePageContext { get; set; }
     public List<FilterSubscription> FilterSubscriptions { get; set; } = FilterSubscription.CreateDefaults();
 }
 

@@ -6,16 +6,28 @@ namespace Chroma.Browser.Tests;
 public sealed class NewTabPageServiceTests
 {
     [Fact]
-    public void HomePageDoesNotExposeBookmarkShortcuts()
+    public void RegularHomePageCanShowUserBookmarkCards()
+    {
+        var page = NewTabPageService.Build(
+            new AppSettings(),
+            [new BookmarkEntry { Title = "My bookmark", Url = "https://example.com/page" }],
+            false);
+
+        Assert.Contains("My bookmark", page, StringComparison.Ordinal);
+        Assert.Contains("https://example.com/page", page, StringComparison.Ordinal);
+        Assert.Contains("Поиск в интернете", page, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void PrivateHomePageDoesNotExposeBookmarkShortcuts()
     {
         var page = NewTabPageService.Build(
             new AppSettings(),
             [new BookmarkEntry { Title = "Private bookmark", Url = "https://example.com/private" }],
-            false);
+            true);
 
         Assert.DoesNotContain("Private bookmark", page, StringComparison.Ordinal);
         Assert.DoesNotContain("https://example.com/private", page, StringComparison.Ordinal);
-        Assert.Contains("Поиск в интернете", page, StringComparison.Ordinal);
     }
 
     [Fact]
