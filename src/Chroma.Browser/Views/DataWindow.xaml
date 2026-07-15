@@ -1,0 +1,91 @@
+<Window x:Class="Chroma.Browser.Views.DataWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Данные Chroma Browser"
+        Width="1000"
+        Height="680"
+        MinWidth="760"
+        MinHeight="480"
+        WindowStartupLocation="CenterOwner"
+        Closed="Window_Closed">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock FontSize="28" FontWeight="SemiBold" Text="Библиотека браузера" />
+        <TextBox x:Name="SearchBox" Grid.Row="1" Height="40" Margin="0,14,0,14" Style="{StaticResource GlassTextBox}" TextChanged="SearchBox_TextChanged" />
+
+        <TabControl x:Name="Sections" Grid.Row="2" SelectionChanged="Sections_SelectionChanged" Background="{StaticResource PanelBrush}" BorderBrush="#38FFFFFF">
+            <TabItem Header="Закладки">
+                <Grid Margin="12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <DataGrid x:Name="BookmarkGrid" IsReadOnly="True" AutoGenerateColumns="False" CanUserAddRows="False" SelectionMode="Single" MouseDoubleClick="BookmarkGrid_MouseDoubleClick">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Название" Binding="{Binding Title}" Width="2*" />
+                            <DataGridTextColumn Header="Адрес" Binding="{Binding Url}" Width="3*" />
+                            <DataGridTextColumn Header="Папка" Binding="{Binding Folder}" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <StackPanel Grid.Row="1" Margin="0,10,0,0" Orientation="Horizontal">
+                        <Button Margin="0,0,7,0" Style="{StaticResource GlassButton}" Click="OpenBookmark_Click" Content="Открыть" />
+                        <Button Margin="0,0,7,0" Style="{StaticResource GlassButton}" Click="DeleteBookmark_Click" Content="Удалить" />
+                        <Button Margin="0,0,7,0" Style="{StaticResource GlassButton}" Click="ImportBookmarks_Click" Content="Импорт" />
+                        <Button Style="{StaticResource GlassButton}" Click="ExportBookmarks_Click" Content="Экспорт" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="История">
+                <Grid Margin="12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <DataGrid x:Name="HistoryGrid" IsReadOnly="True" AutoGenerateColumns="False" CanUserAddRows="False" SelectionMode="Single" MouseDoubleClick="HistoryGrid_MouseDoubleClick">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Время" Binding="{Binding VisitedAt, StringFormat={}{0:g}}" Width="150" />
+                            <DataGridTextColumn Header="Название" Binding="{Binding Title}" Width="2*" />
+                            <DataGridTextColumn Header="Адрес" Binding="{Binding Url}" Width="3*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <StackPanel Grid.Row="1" Margin="0,10,0,0" Orientation="Horizontal">
+                        <Button Margin="0,0,7,0" Style="{StaticResource GlassButton}" Click="OpenHistory_Click" Content="Открыть" />
+                        <Button Margin="0,0,7,0" Style="{StaticResource GlassButton}" Click="DeleteHistory_Click" Content="Удалить" />
+                        <Button Style="{StaticResource GlassButton}" Click="ClearHistory_Click" Content="Очистить историю" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Загрузки">
+                <Grid Margin="12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <DataGrid x:Name="DownloadGrid" IsReadOnly="True" AutoGenerateColumns="False" CanUserAddRows="False" SelectionMode="Single" MouseDoubleClick="DownloadGrid_MouseDoubleClick">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Файл" Binding="{Binding FileName}" Width="2*" />
+                            <DataGridTextColumn Header="Состояние" Binding="{Binding State}" Width="120" />
+                            <DataGridTextColumn Header="Получено" Binding="{Binding ReceivedBytes}" Width="120" />
+                            <DataGridTextColumn Header="Размер" Binding="{Binding TotalBytes}" Width="120" />
+                            <DataGridTextColumn Header="Путь" Binding="{Binding TargetPath}" Width="3*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <StackPanel Grid.Row="1" Margin="0,10,0,0" Orientation="Horizontal">
+                        <Button Margin="0,0,7,0" Style="{StaticResource GlassButton}" Click="OpenDownload_Click" Content="Открыть" />
+                        <Button Margin="0,0,7,0" Style="{StaticResource GlassButton}" Click="OpenDownloadFolder_Click" Content="Показать в папке" />
+                        <Button Margin="0,0,7,0" Style="{StaticResource GlassButton}" Click="PauseDownload_Click" Content="Пауза / продолжить" />
+                        <Button Style="{StaticResource GlassButton}" Click="CancelDownload_Click" Content="Отменить" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
+

@@ -1,0 +1,118 @@
+name: Multi-platform CI
+
+on:
+  push:
+    branches: [main, "agent/**", "codex/**"]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    name: Windows build and tests
+    runs-on: windows-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+          cache: true
+          cache-dependency-path: "**/*.csproj"
+
+      - name: Restore
+        run: dotnet restore ChromaBrowser.sln --locked-mode false -p:PublishReadyToRun=true
+
+      - name: Build
+        run: dotnet build ChromaBrowser.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test tests/Chroma.Browser.Tests/Chroma.Browser.Tests.csproj -c Release --no-build --logger "trx;LogFileName=tests.trx"
+
+      - name: Publish self-contained x64
+        run: dotnet publish src/Chroma.Browser/Chroma.Browser.csproj -c Release -r win-x64 --self-contained true --no-restore -p:PublishReadyToRun=true -o artifacts/windows
+
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ChromaBrowser-Windows-x64
+          path: artifacts/windows
+          if-no-files-found: error
+
+      - name: Upload Windows tests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-test-results
+          path: "**/TestResults/*.trx"
+          if-no-files-found: ignore
+
+  android:
+    name: Android build, lint and tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android platform
+        shell: bash
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Unit tests
+        run: gradle --project-dir android --no-daemon testDebugUnitTest
+
+      - name: Android lint
+        run: gradle --project-dir android --no-daemon lintDebug
+
+      - name: Build installable preview APK
+        run: gradle --project-dir android --no-daemon assembleDebug
+
+      - name: Prepare Android artifact
+        shell: bash
+        run: |
+          mkdir -p artifacts/android
+          cp android/app/build/outputs/apk/debug/app-debug.apk artifacts/android/ChromaBrowser-Android-preview.apk
+          cd artifacts/android
+          sha256sum ChromaBrowser-Android-preview.apk > ChromaBrowser-Android-preview.apk.sha256
+
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ChromaBrowser-Android
+          path: artifacts/android
+          if-no-files-found: error
+
+      - name: Upload Android test and lint reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-reports
+          path: |
+            android/app/build/reports/tests
+            android/app/build/reports/lint-results-debug.html
+            android/app/build/reports/lint-results-debug.xml
+          if-no-files-found: ignore

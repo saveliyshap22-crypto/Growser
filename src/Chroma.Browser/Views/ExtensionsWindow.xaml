@@ -1,0 +1,35 @@
+<Window x:Class="Chroma.Browser.Views.ExtensionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Расширения Chroma Browser"
+        Width="760"
+        Height="520"
+        MinWidth="620"
+        MinHeight="420"
+        WindowStartupLocation="CenterOwner"
+        Loaded="Window_Loaded">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock FontSize="28" FontWeight="SemiBold" Text="Расширения" />
+        <TextBlock Grid.Row="1" Margin="0,6,0,14" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap"
+                   Text="WebView2 безопасно устанавливает распакованные Chromium-расширения из локальной папки. Прямая установка из Chrome Web Store движком не поддерживается." />
+        <DataGrid x:Name="ExtensionGrid" Grid.Row="2" IsReadOnly="True" AutoGenerateColumns="False" CanUserAddRows="False" SelectionMode="Single">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="2*" />
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="3*" />
+                <DataGridCheckBoxColumn Header="Включено" Binding="{Binding IsEnabled}" Width="100" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Row="3" Margin="0,12,0,0" Orientation="Horizontal">
+            <Button Margin="0,0,7,0" Style="{StaticResource GlassButton}" Click="Add_Click" Content="Установить из папки" />
+            <Button Margin="0,0,7,0" Style="{StaticResource GlassButton}" Click="Toggle_Click" Content="Включить / выключить" />
+            <Button Style="{StaticResource GlassButton}" Click="Remove_Click" Content="Удалить" />
+        </StackPanel>
+    </Grid>
+</Window>
+

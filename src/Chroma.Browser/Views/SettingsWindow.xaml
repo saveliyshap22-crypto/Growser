@@ -1,0 +1,115 @@
+<Window x:Class="Chroma.Browser.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Настройки Chroma Browser"
+        Width="820"
+        Height="680"
+        MinWidth="720"
+        MinHeight="560"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource WindowBrush}">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Margin="4,0,0,16">
+            <TextBlock FontSize="28" FontWeight="SemiBold" Text="Настройки" />
+            <TextBlock Margin="0,4,0,0" Foreground="{StaticResource MutedTextBrush}" Text="Внешний вид, производительность, приватность и службы браузера" />
+        </StackPanel>
+
+        <TabControl Grid.Row="1" Background="{StaticResource PanelBrush}" BorderBrush="#38FFFFFF">
+            <TabItem Header="Внешний вид">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="22">
+                        <TextBlock FontSize="18" FontWeight="SemiBold" Text="Оформление" />
+                        <TextBlock Margin="0,14,0,5" Text="Тема" />
+                        <ComboBox x:Name="ThemeBox" Width="220" HorizontalAlignment="Left" />
+                        <TextBlock Margin="0,14,0,5" Text="Цвет акцента (#RRGGBB)" />
+                        <TextBox x:Name="AccentBox" Width="220" HorizontalAlignment="Left" Style="{StaticResource GlassTextBox}" />
+                        <TextBlock Margin="0,14,0,4" Text="Прозрачность интерфейса" />
+                        <Slider x:Name="OpacitySlider" Minimum="0.78" Maximum="1" TickFrequency="0.01" IsSnapToTickEnabled="True" />
+                        <CheckBox x:Name="MicaCheck" Margin="0,14,0,0" Content="Использовать Mica в Windows 11" />
+                        <CheckBox x:Name="ReduceMotionCheck" Content="Уменьшить анимации" />
+                        <TextBlock Margin="0,18,0,5" Text="Обои новой вкладки" />
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Margin="8,0,0,0" Style="{StaticResource GlassButton}" Click="BrowseWallpaper_Click" Content="Выбрать" />
+                            <TextBox x:Name="WallpaperBox" Style="{StaticResource GlassTextBox}" />
+                        </DockPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Производительность">
+                <StackPanel Margin="22">
+                    <TextBlock FontSize="18" FontWeight="SemiBold" Text="Вкладки и память" />
+                    <CheckBox x:Name="RestoreSessionCheck" Margin="0,16,0,0" Content="Восстанавливать прошлый сеанс" />
+                    <CheckBox x:Name="SuspendTabsCheck" Content="Приостанавливать фоновые вкладки" />
+                    <TextBlock Margin="0,14,0,5" Text="Приостанавливать после, минут" />
+                    <TextBox x:Name="SuspendMinutesBox" Width="120" HorizontalAlignment="Left" Style="{StaticResource GlassTextBox}" />
+                    <TextBlock Margin="0,18,0,0" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap"
+                               Text="WebView2 использует изоляцию процессов Chromium. Chroma приостанавливает фоновые страницы, а сам движок освобождает память под давлением системы." />
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="Приватность">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="22">
+                        <TextBlock FontSize="18" FontWeight="SemiBold" Text="Конфиденциальность и защита" />
+                        <CheckBox x:Name="HttpsFirstCheck" Margin="0,16,0,0" Content="HTTPS First для введённых адресов" />
+                        <CheckBox x:Name="AdBlockCheck" Content="Встроенная блокировка рекламы и трекеров" />
+                        <CheckBox x:Name="TrackingCheck" Content="Строгая защита от отслеживания Chromium" />
+                        <CheckBox x:Name="EnhancedSecurityCheck" Content="Усиленный режим безопасности" />
+                        <CheckBox x:Name="ClearOnExitCheck" Content="Очищать данные просмотра при выходе" />
+                        <Separator Margin="0,14" />
+                        <CheckBox x:Name="PasswordAutosaveCheck" Content="Предлагать сохранять пароли" />
+                        <CheckBox x:Name="AutofillCheck" Content="Автозаполнение форм" />
+                        <TextBlock Margin="0,16,0,0" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap"
+                                   Text="Хранилище Chroma шифруется Windows DPAPI и открывается только после проверки Windows Hello." />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Поиск и AI">
+                <StackPanel Margin="22">
+                    <TextBlock FontSize="18" FontWeight="SemiBold" Text="Поиск" />
+                    <TextBlock Margin="0,14,0,5" Text="Поисковая система" />
+                    <ComboBox x:Name="SearchEngineBox" Width="250" HorizontalAlignment="Left" DisplayMemberPath="Name" />
+                    <TextBlock Margin="0,22,0,5" FontSize="18" FontWeight="SemiBold" Text="ИИ-панель" />
+                    <ComboBox x:Name="AiProviderBox" Width="250" HorizontalAlignment="Left" DisplayMemberPath="Name" />
+                    <TextBlock Margin="0,14,0,0" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap"
+                               Text="Chroma открывает официальный сайт выбранного сервиса в отдельном Chromium-профиле окна. Аккаунты, доступность и лимиты определяет сам поставщик." />
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="Загрузки">
+                <StackPanel Margin="22">
+                    <TextBlock FontSize="18" FontWeight="SemiBold" Text="Загрузки" />
+                    <TextBlock Margin="0,14,0,5" Text="Папка сохранения" />
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Margin="8,0,0,0" Style="{StaticResource GlassButton}" Click="BrowseDownloads_Click" Content="Выбрать" />
+                        <TextBox x:Name="DownloadFolderBox" Style="{StaticResource GlassTextBox}" />
+                    </DockPanel>
+                    <CheckBox x:Name="AskDownloadCheck" Margin="0,14,0,0" Content="Всегда спрашивать место сохранения" />
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="Обновления">
+                <StackPanel Margin="22">
+                    <TextBlock FontSize="18" FontWeight="SemiBold" Text="Обновления" />
+                    <CheckBox x:Name="AutoUpdateCheck" Margin="0,16,0,0" Content="Автоматически проверять обновления" />
+                    <TextBlock Margin="0,14,0,0" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap"
+                               Text="Перед запуском обновления Chroma проверяет SHA-256, опубликованный вместе с релизом." />
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Grid.Row="2" Margin="0,16,0,0" HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button Width="110" Margin="0,0,8,0" Style="{StaticResource GlassButton}" Click="Cancel_Click" Content="Отмена" />
+            <Button Width="130" Style="{StaticResource GlassButton}" Click="Save_Click" Content="Сохранить" />
+        </StackPanel>
+    </Grid>
+</Window>
+
