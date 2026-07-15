@@ -1,0 +1,33 @@
+name: Inspect v0.6.0 release run
+
+on:
+  push:
+    paths:
+      - .github/workflows/inspect-v060-release.yml
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect release workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_SHA: ef59acc1f0ec8ef86a3c941889ae76ca51dc92ea
+        shell: bash
+        run: |
+          sleep 30
+          curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${RELEASE_SHA}&per_page=20" \
+            | jq '{runs: [.workflow_runs[] | {id, name, event, status, conclusion, created_at, updated_at, html_url}]}' \
+            > .release-runs-v060.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .release-runs-v060.json
+          git commit -m "Record v0.6.0 release workflow status" || true
+          git pull --rebase origin main
+          git push
