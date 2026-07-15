@@ -867,7 +867,7 @@ public class MainActivity extends Activity {
             ? "Приватная сессия: история и данные просмотра не сохраняются."
             : "Введите запрос — результаты откроются в выбранной поисковой системе.";
 
-        return """
+        return String.format(java.util.Locale.ROOT, """
             <!doctype html><html lang="ru"><head><meta charset="utf-8">
             <meta name="viewport" content="width=device-width,initial-scale=1">
             <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; form-action https:; navigate-to https: http:">
@@ -882,7 +882,7 @@ public class MainActivity extends Activity {
             </style></head><body><main><h1>Chroma <span>Browser</span></h1>
             <form action="%s" method="get"><span class="icon">⌕</span><input name="%s" autofocus autocomplete="off" enterkeyhint="search" placeholder="Поиск в интернете"><button type="submit" aria-label="Найти">→</button></form>
             <p>%s</p></main></body></html>
-            """.formatted(escapeHtml(action), escapeHtml(queryName), escapeHtml(subtitle));
+            """, escapeHtml(action), escapeHtml(queryName), escapeHtml(subtitle));
     }
 
     private static String escapeHtml(String value) {
