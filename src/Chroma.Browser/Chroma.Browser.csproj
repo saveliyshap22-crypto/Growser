@@ -7,9 +7,9 @@
     <RootNamespace>Chroma.Browser</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Resources\Chroma.ico</ApplicationIcon>
-    <Version>0.2.0</Version>
-    <FileVersion>0.2.0.0</FileVersion>
-    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <Version>0.3.0</Version>
+    <FileVersion>0.3.0.0</FileVersion>
+    <AssemblyVersion>0.3.0.0</AssemblyVersion>
     <Authors>Chroma Browser contributors</Authors>
     <Product>Chroma Browser</Product>
     <Description>Chroma Browser for Windows, powered by Chromium WebView2.</Description>
