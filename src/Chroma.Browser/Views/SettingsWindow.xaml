@@ -2,34 +2,71 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Настройки Chroma Browser"
-        Width="820"
-        Height="680"
-        MinWidth="720"
-        MinHeight="560"
+        Width="860"
+        Height="710"
+        MinWidth="740"
+        MinHeight="580"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource WindowBrush}">
-    <Grid Margin="20">
+    <Grid Margin="22">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Margin="4,0,0,16">
-            <TextBlock FontSize="28" FontWeight="SemiBold" Text="Настройки" />
-            <TextBlock Margin="0,4,0,0" Foreground="{StaticResource MutedTextBrush}" Text="Внешний вид, производительность, приватность и службы браузера" />
+        <StackPanel Margin="5,0,0,18">
+            <TextBlock FontSize="30" FontWeight="SemiBold" Text="Настройки" />
+            <TextBlock Margin="0,5,0,0" Foreground="{StaticResource MutedTextBrush}" Text="Внешний вид, производительность, приватность и службы браузера" />
         </StackPanel>
 
         <TabControl Grid.Row="1" Background="{StaticResource PanelBrush}" BorderBrush="#38FFFFFF">
             <TabItem Header="Внешний вид">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="22">
-                        <TextBlock FontSize="18" FontWeight="SemiBold" Text="Оформление" />
-                        <TextBlock Margin="0,14,0,5" Text="Тема" />
-                        <ComboBox x:Name="ThemeBox" Width="220" HorizontalAlignment="Left" />
-                        <TextBlock Margin="0,14,0,5" Text="Цвет акцента (#RRGGBB)" />
-                        <TextBox x:Name="AccentBox" Width="220" HorizontalAlignment="Left" Style="{StaticResource GlassTextBox}" />
-                        <TextBlock Margin="0,14,0,4" Text="Прозрачность интерфейса" />
+                    <StackPanel Margin="24">
+                        <TextBlock FontSize="19" FontWeight="SemiBold" Text="Оформление" />
+                        <TextBlock Margin="0,15,0,6" Text="Тема" />
+                        <ComboBox x:Name="ThemeBox" Width="230" HorizontalAlignment="Left" />
+
+                        <TextBlock Margin="0,18,0,6" Text="Цвет акцента" />
+                        <TextBlock Margin="0,0,0,10" Foreground="{StaticResource MutedTextBrush}" FontSize="12" Text="Выберите цвет из палитры — вводить код вручную больше не нужно." />
+                        <ListBox x:Name="AccentPalette"
+                                 Height="60"
+                                 HorizontalAlignment="Left"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 Padding="0"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBoxItem Tag="#FF8A3D" ToolTip="Оранжевый" Margin="0,0,8,0" Padding="4">
+                                <Border Width="40" Height="40" CornerRadius="20" Background="#FF8A3D" BorderBrush="#66FFFFFF" BorderThickness="1" />
+                            </ListBoxItem>
+                            <ListBoxItem Tag="#FFB020" ToolTip="Янтарный" Margin="0,0,8,0" Padding="4">
+                                <Border Width="40" Height="40" CornerRadius="20" Background="#FFB020" BorderBrush="#66FFFFFF" BorderThickness="1" />
+                            </ListBoxItem>
+                            <ListBoxItem Tag="#FF5C72" ToolTip="Коралловый" Margin="0,0,8,0" Padding="4">
+                                <Border Width="40" Height="40" CornerRadius="20" Background="#FF5C72" BorderBrush="#66FFFFFF" BorderThickness="1" />
+                            </ListBoxItem>
+                            <ListBoxItem Tag="#AEB8FF" ToolTip="Лавандовый" Margin="0,0,8,0" Padding="4">
+                                <Border Width="40" Height="40" CornerRadius="20" Background="#AEB8FF" BorderBrush="#66FFFFFF" BorderThickness="1" />
+                            </ListBoxItem>
+                            <ListBoxItem Tag="#58A6FF" ToolTip="Синий" Margin="0,0,8,0" Padding="4">
+                                <Border Width="40" Height="40" CornerRadius="20" Background="#58A6FF" BorderBrush="#66FFFFFF" BorderThickness="1" />
+                            </ListBoxItem>
+                            <ListBoxItem Tag="#53D6A5" ToolTip="Мятный" Margin="0,0,8,0" Padding="4">
+                                <Border Width="40" Height="40" CornerRadius="20" Background="#53D6A5" BorderBrush="#66FFFFFF" BorderThickness="1" />
+                            </ListBoxItem>
+                            <ListBoxItem Tag="#D879FF" ToolTip="Фиолетовый" Padding="4">
+                                <Border Width="40" Height="40" CornerRadius="20" Background="#D879FF" BorderBrush="#66FFFFFF" BorderThickness="1" />
+                            </ListBoxItem>
+                        </ListBox>
+
+                        <TextBlock Margin="0,18,0,4" Text="Прозрачность интерфейса" />
                         <Slider x:Name="OpacitySlider" Minimum="0.78" Maximum="1" TickFrequency="0.01" IsSnapToTickEnabled="True" />
                         <CheckBox x:Name="MicaCheck" Margin="0,14,0,0" Content="Использовать Mica в Windows 11" />
                         <CheckBox x:Name="ReduceMotionCheck" Content="Уменьшить анимации" />
@@ -43,8 +80,8 @@
             </TabItem>
 
             <TabItem Header="Производительность">
-                <StackPanel Margin="22">
-                    <TextBlock FontSize="18" FontWeight="SemiBold" Text="Вкладки и память" />
+                <StackPanel Margin="24">
+                    <TextBlock FontSize="19" FontWeight="SemiBold" Text="Вкладки и память" />
                     <CheckBox x:Name="RestoreSessionCheck" Margin="0,16,0,0" Content="Восстанавливать прошлый сеанс" />
                     <CheckBox x:Name="SuspendTabsCheck" Content="Приостанавливать фоновые вкладки" />
                     <TextBlock Margin="0,14,0,5" Text="Приостанавливать после, минут" />
@@ -56,8 +93,8 @@
 
             <TabItem Header="Приватность">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="22">
-                        <TextBlock FontSize="18" FontWeight="SemiBold" Text="Конфиденциальность и защита" />
+                    <StackPanel Margin="24">
+                        <TextBlock FontSize="19" FontWeight="SemiBold" Text="Конфиденциальность и защита" />
                         <CheckBox x:Name="HttpsFirstCheck" Margin="0,16,0,0" Content="HTTPS First для введённых адресов" />
                         <CheckBox x:Name="AdBlockCheck" Content="Встроенная блокировка рекламы и трекеров" />
                         <CheckBox x:Name="TrackingCheck" Content="Строгая защита от отслеживания Chromium" />
@@ -73,11 +110,11 @@
             </TabItem>
 
             <TabItem Header="Поиск и AI">
-                <StackPanel Margin="22">
-                    <TextBlock FontSize="18" FontWeight="SemiBold" Text="Поиск" />
+                <StackPanel Margin="24">
+                    <TextBlock FontSize="19" FontWeight="SemiBold" Text="Поиск" />
                     <TextBlock Margin="0,14,0,5" Text="Поисковая система" />
                     <ComboBox x:Name="SearchEngineBox" Width="250" HorizontalAlignment="Left" DisplayMemberPath="Name" />
-                    <TextBlock Margin="0,22,0,5" FontSize="18" FontWeight="SemiBold" Text="ИИ-панель" />
+                    <TextBlock Margin="0,22,0,5" FontSize="19" FontWeight="SemiBold" Text="ИИ-панель" />
                     <ComboBox x:Name="AiProviderBox" Width="250" HorizontalAlignment="Left" DisplayMemberPath="Name" />
                     <TextBlock Margin="0,14,0,0" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap"
                                Text="Chroma открывает официальный сайт выбранного сервиса в отдельном Chromium-профиле окна. Аккаунты, доступность и лимиты определяет сам поставщик." />
@@ -85,8 +122,8 @@
             </TabItem>
 
             <TabItem Header="Загрузки">
-                <StackPanel Margin="22">
-                    <TextBlock FontSize="18" FontWeight="SemiBold" Text="Загрузки" />
+                <StackPanel Margin="24">
+                    <TextBlock FontSize="19" FontWeight="SemiBold" Text="Загрузки" />
                     <TextBlock Margin="0,14,0,5" Text="Папка сохранения" />
                     <DockPanel>
                         <Button DockPanel.Dock="Right" Margin="8,0,0,0" Style="{StaticResource GlassButton}" Click="BrowseDownloads_Click" Content="Выбрать" />
@@ -97,8 +134,8 @@
             </TabItem>
 
             <TabItem Header="Обновления">
-                <StackPanel Margin="22">
-                    <TextBlock FontSize="18" FontWeight="SemiBold" Text="Обновления" />
+                <StackPanel Margin="24">
+                    <TextBlock FontSize="19" FontWeight="SemiBold" Text="Обновления" />
                     <CheckBox x:Name="AutoUpdateCheck" Margin="0,16,0,0" Content="Автоматически проверять обновления" />
                     <TextBlock Margin="0,14,0,0" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap"
                                Text="Перед запуском обновления Chroma проверяет SHA-256, опубликованный вместе с релизом." />
@@ -106,10 +143,9 @@
             </TabItem>
         </TabControl>
 
-        <StackPanel Grid.Row="2" Margin="0,16,0,0" HorizontalAlignment="Right" Orientation="Horizontal">
+        <StackPanel Grid.Row="2" Margin="0,18,0,0" HorizontalAlignment="Right" Orientation="Horizontal">
             <Button Width="110" Margin="0,0,8,0" Style="{StaticResource GlassButton}" Click="Cancel_Click" Content="Отмена" />
-            <Button Width="130" Style="{StaticResource GlassButton}" Click="Save_Click" Content="Сохранить" />
+            <Button Width="135" Style="{StaticResource GlassButton}" Click="Save_Click" Content="Сохранить" />
         </StackPanel>
     </Grid>
 </Window>
-
