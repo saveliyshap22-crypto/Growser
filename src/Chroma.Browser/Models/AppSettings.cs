@@ -20,12 +20,36 @@ public enum TabWidthMode
     Wide
 }
 
+public enum SurfaceShapeMode
+{
+    Rounded,
+    Balanced,
+    Square
+}
+
+public enum GlassMode
+{
+    Strong,
+    Soft,
+    Off
+}
+
+public enum CursorStyleMode
+{
+    System,
+    WhiteDot,
+    BlackDot,
+    RainbowDot
+}
+
 public sealed class AppSettings
 {
     public ThemeMode Theme { get; set; } = ThemeMode.System;
     public string AccentColor { get; set; } = "#FF8A3D";
-    public double InterfaceOpacity { get; set; } = 0.94;
+    public double InterfaceOpacity { get; set; } = 0.96;
     public double GlassIntensity { get; set; } = 0.78;
+    public GlassMode GlassMode { get; set; } = GlassMode.Strong;
+    public SurfaceShapeMode SurfaceShape { get; set; } = SurfaceShapeMode.Rounded;
     public double CornerRadius { get; set; } = 18;
     public InterfaceDensity InterfaceDensity { get; set; } = InterfaceDensity.Comfortable;
     public TabWidthMode TabWidthMode { get; set; } = TabWidthMode.Adaptive;
@@ -33,6 +57,9 @@ public sealed class AppSettings
     public bool ShowAmbientGlow { get; set; } = true;
     public bool UseMica { get; set; } = true;
     public bool ReduceMotion { get; set; }
+    public CursorStyleMode CursorStyle { get; set; } = CursorStyleMode.System;
+    public int CursorSize { get; set; } = 16;
+    public bool MediaPillEnabled { get; set; } = true;
     public bool RestoreSession { get; set; } = true;
     public bool SuspendBackgroundTabs { get; set; } = true;
     public int SuspendAfterMinutes { get; set; } = 20;
@@ -56,6 +83,7 @@ public sealed class AppSettings
     public double AiPanelWidth { get; set; } = 430;
     public bool AiPanelVisible { get; set; }
     public bool AiIncludePageContext { get; set; }
+    public int AiContextCharacterLimit { get; set; } = 12000;
     public List<FilterSubscription> FilterSubscriptions { get; set; } = FilterSubscription.CreateDefaults();
 }
 
