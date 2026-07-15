@@ -28,21 +28,15 @@
                 android:contentDescription="@string/app_name"
                 android:src="@drawable/chroma_icon" />
 
-            <HorizontalScrollView
+            <TextView
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="7dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="9dp"
                 android:layout_weight="1"
-                android:fillViewport="false"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:id="@+id/tabBar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal" />
-            </HorizontalScrollView>
+                android:text="Chroma"
+                android:textColor="@color/chroma_text"
+                android:textSize="17sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/privateBadge"
@@ -111,7 +105,7 @@
             <EditText
                 android:id="@+id/addressBar"
                 android:layout_width="0dp"
-                android:layout_height="44dp"
+                android:layout_height="46dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1"
                 android:background="@drawable/address_surface"
@@ -181,10 +175,25 @@
                 android:visibility="gone" />
         </FrameLayout>
 
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_marginTop="7dp"
+            android:fillViewport="false"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/tabBar"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="58dp"
-            android:layout_marginTop="7dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="5dp"
             android:background="@drawable/glass_panel"
             android:gravity="center"
             android:orientation="horizontal">
@@ -192,32 +201,10 @@
             <Button
                 android:id="@+id/homeButton"
                 android:layout_width="0dp"
-                android:layout_height="44dp"
+                android:layout_height="50dp"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:text="⌂\nГлавная"
-                android:textAllCaps="false"
-                android:textColor="@color/chroma_text"
-                android:textSize="11sp" />
-
-            <Button
-                android:id="@+id/bookmarkButton"
-                android:layout_width="0dp"
-                android:layout_height="44dp"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:text="☆\nЗакладка"
-                android:textAllCaps="false"
-                android:textColor="@color/chroma_text"
-                android:textSize="11sp" />
-
-            <Button
-                android:id="@+id/aiButton"
-                android:layout_width="0dp"
-                android:layout_height="44dp"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:text="AI\nПомощник"
                 android:textAllCaps="false"
                 android:textColor="@color/chroma_accent"
                 android:textSize="11sp" />
@@ -225,7 +212,7 @@
             <Button
                 android:id="@+id/tabsButton"
                 android:layout_width="0dp"
-                android:layout_height="44dp"
+                android:layout_height="50dp"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:text="▣\nВкладки"
@@ -234,12 +221,34 @@
                 android:textSize="11sp" />
 
             <Button
-                android:id="@+id/bottomMenuButton"
+                android:id="@+id/bookmarkButton"
                 android:layout_width="0dp"
-                android:layout_height="44dp"
+                android:layout_height="50dp"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
-                android:text="•••\nЕщё"
+                android:text="☆\nЗакладки"
+                android:textAllCaps="false"
+                android:textColor="@color/chroma_text"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/aiButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:text="AI\nПомощник"
+                android:textAllCaps="false"
+                android:textColor="@color/chroma_text"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/bottomMenuButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:text="☰\nМеню"
                 android:textAllCaps="false"
                 android:textColor="@color/chroma_text"
                 android:textSize="11sp" />
