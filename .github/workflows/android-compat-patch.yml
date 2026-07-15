@@ -1,0 +1,41 @@
+name: Android compatibility source patch
+
+on:
+  push:
+    branches: ["agent/chroma-browser-foundation"]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: ${{ contains(github.event.head_commit.message, 'Apply Android compatibility fix') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/chroma-browser-foundation
+
+      - name: Replace API 34-only String.formatted call
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path("android/app/src/main/java/com/chromabrowser/app/MainActivity.java")
+          text = path.read_text(encoding="utf-8")
+          old_start = '        return """\n            <!doctype html>'
+          new_start = '        return String.format(java.util.Locale.ROOT, """\n            <!doctype html>'
+          old_end = '            """.formatted(escapeHtml(action), escapeHtml(queryName), escapeHtml(subtitle));'
+          new_end = '            """, escapeHtml(action), escapeHtml(queryName), escapeHtml(subtitle));'
+          if text.count(old_start) != 1 or text.count(old_end) != 1:
+              raise SystemExit("Expected new-tab formatting expressions were not found exactly once")
+          path.write_text(text.replace(old_start, new_start, 1).replace(old_end, new_end, 1), encoding="utf-8")
+
+      - name: Commit compatibility fix
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add android/app/src/main/java/com/chromabrowser/app/MainActivity.java
+          git commit -m "Fix Android 9 string formatting compatibility"
+          git push origin HEAD:agent/chroma-browser-foundation
