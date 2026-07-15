@@ -10,7 +10,7 @@ public enum ThemeMode
 public sealed class AppSettings
 {
     public ThemeMode Theme { get; set; } = ThemeMode.System;
-    public string AccentColor { get; set; } = "#AEB8FF";
+    public string AccentColor { get; set; } = "#FF8A3D";
     public double InterfaceOpacity { get; set; } = 0.92;
     public double CornerRadius { get; set; } = 14;
     public bool UseMica { get; set; } = true;
