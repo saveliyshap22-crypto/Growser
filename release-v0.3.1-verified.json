@@ -1,0 +1,16 @@
+{
+  "assets": {
+    "ChromaBrowser-Android-0.3.1-preview.apk": 176540,
+    "ChromaBrowser-Android-0.3.1-preview.apk.sha256": 106,
+    "ChromaBrowser-Portable-0.3.1-win-x64.zip": 89652827,
+    "ChromaBrowser-Portable-0.3.1-win-x64.zip.sha256": 106,
+    "ChromaBrowser-Setup-0.3.1-x64.exe": 61731159,
+    "ChromaBrowser-Setup-0.3.1-x64.exe.sha256": 99
+  },
+  "draft": false,
+  "html_url": "https://github.com/saveliyshap22-crypto/Growser/releases/tag/v0.3.1",
+  "name": "Chroma Browser v0.3.1",
+  "prerelease": false,
+  "published_at": "2026-07-15T09:22:13Z",
+  "tag": "v0.3.1"
+}
