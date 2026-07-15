@@ -19,6 +19,7 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - name: Capture compiler diagnostics
+        continue-on-error: true
         shell: pwsh
         run: |
           dotnet restore ChromaBrowser.sln
@@ -26,10 +27,12 @@ jobs:
           $lines = $output -split "`r?`n" | Where-Object { $_ -match 'error (CS|MC|XDG|NETSDK)|: error ' }
           if (-not $lines) { $lines = @('BUILD_OK') }
           $lines | Set-Content .build-errors-v060.txt
-          $global:LASTEXITCODE = 0
+          exit 0
       - name: Publish diagnostic result
+        if: always()
         shell: pwsh
         run: |
+          if (-not (Test-Path .build-errors-v060.txt)) { 'DIAGNOSTIC_STEP_FAILED' | Set-Content .build-errors-v060.txt }
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .build-errors-v060.txt
