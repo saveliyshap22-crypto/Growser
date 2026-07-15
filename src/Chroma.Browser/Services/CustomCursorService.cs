@@ -185,7 +185,7 @@ public static class CustomCursorService
         var p = value * (1 - saturation);
         var q = value * (1 - (fraction * saturation));
         var t = value * (1 - ((1 - fraction) * saturation));
-        var (red, green, blue) = index % 6 switch
+        var (red, green, blue) = (index % 6) switch
         {
             0 => (value, t, p),
             1 => (q, value, p),
