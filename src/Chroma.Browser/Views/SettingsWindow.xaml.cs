@@ -341,8 +341,15 @@ public partial class SettingsWindow : Window
         }
     }
 
-    private static T SelectedValue<T>(ComboBox box, IReadOnlyList<Choice<T>> choices, T fallback) =>
-        box.SelectedItem is Choice<T> selected ? selected.Value : choices.FirstOrDefault()?.Value ?? fallback;
+    private static T SelectedValue<T>(ComboBox box, IReadOnlyList<Choice<T>> choices, T fallback)
+    {
+        if (box.SelectedItem is Choice<T> selected)
+        {
+            return selected.Value;
+        }
+
+        return choices.Count > 0 ? choices[0].Value : fallback;
+    }
 
     private static void EnsureCursorResource(AppSettings settings)
     {
