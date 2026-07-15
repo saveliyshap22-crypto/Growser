@@ -1,0 +1,44 @@
+name: Patch Windows v0.6.0 compile cleanup
+
+on:
+  push:
+    paths:
+      - .github/workflows/patch-windows-v060.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/chroma-0.6.0-ui-audit
+      - name: Apply compile-safe generic selection helper
+        shell: python
+        run: |
+          from pathlib import Path
+          path = Path('src/Chroma.Browser/Views/SettingsWindow.xaml.cs')
+          text = path.read_text(encoding='utf-8')
+          old = '''    private static T SelectedValue<T>(ComboBox box, IReadOnlyList<Choice<T>> choices, T fallback) =>
+                  box.SelectedItem is Choice<T> selected ? selected.Value : choices.FirstOrDefault()?.Value ?? fallback;'''
+          new = '''    private static T SelectedValue<T>(ComboBox box, IReadOnlyList<Choice<T>> choices, T fallback)
+              {
+                  if (box.SelectedItem is Choice<T> selected)
+                  {
+                      return selected.Value;
+                  }
+
+                  return choices.Count > 0 ? choices[0].Value : fallback;
+              }'''
+          if old not in text:
+              raise SystemExit('selection helper changed unexpectedly')
+          path.write_text(text.replace(old, new), encoding='utf-8')
+      - name: Commit compile cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/Chroma.Browser/Views/SettingsWindow.xaml.cs
+          git commit -m "Make settings selection helper compile-safe"
+          git push origin HEAD:agent/chroma-0.6.0-ui-audit
