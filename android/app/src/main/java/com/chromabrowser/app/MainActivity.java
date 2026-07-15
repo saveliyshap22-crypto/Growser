@@ -275,7 +275,7 @@ public class MainActivity extends Activity {
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         settings.setSafeBrowsingEnabled(true);
         settings.setGeolocationEnabled(true);
-        settings.setUserAgentString(WebSettings.getDefaultUserAgent(this) + " ChromaBrowser/0.3");
+        settings.setUserAgentString(WebSettings.getDefaultUserAgent(this) + " ChromaBrowser/0.6");
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView,
             store != null && store.preferences().getBoolean("third_party_cookies", false));
         webView.setWebViewClient(new ChromaWebViewClient(tab));
@@ -361,14 +361,17 @@ public class MainActivity extends Activity {
             GradientDrawable background = new GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
                 index == selectedTab
-                    ? new int[]{Color.argb(235, 65, 70, 82), Color.argb(225, 48, 52, 62)}
-                    : new int[]{Color.argb(110, 52, 56, 64), Color.argb(80, 38, 41, 48)});
-            background.setCornerRadius(dp(19));
+                    ? new int[]{Color.argb(238, 70, 55, 43), Color.argb(232, 47, 42, 39)}
+                    : new int[]{Color.argb(188, 50, 54, 62), Color.argb(170, 31, 34, 40)});
+            background.setCornerRadius(dp(16));
             background.setStroke(dp(1), index == selectedTab
-                ? Color.argb(95, 255, 255, 255)
-                : Color.argb(38, 255, 255, 255));
+                ? Color.argb(150, 255, 138, 61)
+                : Color.argb(54, 255, 138, 61));
             chip.setBackground(background);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dp(150), dp(38));
+            int screenWidth = getResources().getDisplayMetrics().widthPixels - dp(20);
+            int visibleTarget = Math.max(2, Math.min(tabs.size(), 4));
+            int adaptiveWidth = Math.max(dp(96), Math.min(dp(154), screenWidth / visibleTarget));
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(adaptiveWidth, dp(38));
             params.setMarginEnd(dp(5));
             chip.setLayoutParams(params);
             int capturedIndex = index;
@@ -403,7 +406,7 @@ public class MainActivity extends Activity {
 
     private void setBottomNavigationState(Button active) {
         int normal = Color.rgb(245, 247, 250);
-        int accent = Color.rgb(174, 184, 255);
+        int accent = Color.rgb(255, 138, 61);
         homeButton.setTextColor(active == homeButton ? accent : normal);
         tabsButton.setTextColor(active == tabsButton ? accent : normal);
         bookmarkButton.setTextColor(active == bookmarkButton ? accent : normal);
@@ -573,8 +576,8 @@ public class MainActivity extends Activity {
         tab.desktopMode = !tab.desktopMode;
         String agent = tab.desktopMode
             ? "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-              "(KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 ChromaBrowser/0.3"
-            : WebSettings.getDefaultUserAgent(this) + " ChromaBrowser/0.3";
+              "(KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 ChromaBrowser/0.6"
+            : WebSettings.getDefaultUserAgent(this) + " ChromaBrowser/0.6";
         tab.webView.getSettings().setUserAgentString(agent);
         tab.webView.reload();
     }
@@ -676,6 +679,9 @@ public class MainActivity extends Activity {
 
     private void configureAi() {
         aiConfigured = true;
+        aiProviders.put("ChatGPT", "https://chatgpt.com/");
+        aiProviders.put("Claude", "https://claude.ai/new");
+        aiProviders.put("Gemini", "https://gemini.google.com/app");
         aiProviders.put("Mistral", "https://chat.mistral.ai/chat");
         aiProviders.put("Qwen", "https://chat.qwen.ai/");
         aiProviders.put("DeepSeek", "https://chat.deepseek.com/");
@@ -702,7 +708,7 @@ public class MainActivity extends Activity {
         settings.setSafeBrowsingEnabled(true);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         settings.setMediaPlaybackRequiresUserGesture(true);
-        settings.setUserAgentString(WebSettings.getDefaultUserAgent(this) + " ChromaBrowserAI/0.3");
+        settings.setUserAgentString(WebSettings.getDefaultUserAgent(this) + " ChromaBrowserAI/0.6");
         CookieManager.getInstance().setAcceptThirdPartyCookies(aiWebView, true);
         aiWebView.setWebViewClient(new WebViewClient() {
             @Override
