@@ -3,13 +3,13 @@ name: Release
 on:
   push:
     tags: ["v*"]
-    branches: ["agent/chroma-browser-foundation"]
+    branches: [main]
   workflow_dispatch:
     inputs:
       version:
         description: "Version without v prefix"
         required: true
-        default: "0.2.0"
+        default: "0.3.0"
 
 permissions:
   contents: read
@@ -17,11 +17,11 @@ permissions:
 jobs:
   windows:
     name: Package Windows
-    if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, 'Publish Chroma Browser v0.2.0')
+    if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/') || (github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'Release Chroma Browser v')) }}
     runs-on: windows-latest
     timeout-minutes: 50
     env:
-      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.2.0' }}
+      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.3.0' }}
 
     steps:
       - name: Checkout
@@ -74,12 +74,12 @@ jobs:
           if-no-files-found: error
 
   android:
-    name: Package Android
-    if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, 'Publish Chroma Browser v0.2.0')
+    name: Package Android preview
+    if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/') || (github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'Release Chroma Browser v')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
-      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.2.0' }}
+      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.3.0' }}
 
     steps:
       - name: Checkout
@@ -131,10 +131,12 @@ jobs:
   publish:
     name: Publish GitHub Release
     needs: [windows, android]
-    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'Publish Chroma Browser v0.2.0')
+    if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/') || (github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'Release Chroma Browser v')) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.3.0' }}
 
     steps:
       - name: Download verified packages
@@ -147,13 +149,13 @@ jobs:
       - name: Resolve release tag
         shell: bash
         run: |
+          version="${RAW_VERSION#v}"
           if [[ "$GITHUB_REF" == refs/tags/* ]]; then
             tag="$GITHUB_REF_NAME"
-          elif [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
-            tag="v${{ inputs.version }}"
           else
-            tag="v0.2.0"
+            tag="v${version}"
           fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
           echo "RELEASE_TAG=$tag" >> "$GITHUB_ENV"
 
       - name: Publish release
@@ -166,9 +168,15 @@ jobs:
           target_commitish: ${{ github.sha }}
           name: Chroma Browser ${{ env.RELEASE_TAG }}
           body: |
-            Chroma Browser for Windows and Android.
+            ## Chroma Browser 0.3.0
 
-            - Windows: use the Setup EXE or portable ZIP.
-            - Android: the preview APK is installable directly, but uses a CI preview signature and is not a Play Store package.
-            - SHA-256 checksum files are included for every package.
+            Обновление интерфейса для Windows и Android.
+
+            - На главном экране оставлена крупная центральная поисковая строка без набора внешних ссылок.
+            - На Android переключатель открытых вкладок перенесён вниз, а основная навигация стала понятнее.
+            - Улучшены скругления, стеклянные поверхности, отступы и активные состояния.
+            - Версии Windows и Android синхронизированы до 0.3.0.
+            - Windows: используйте Setup EXE или portable ZIP.
+            - Android: preview APK устанавливается напрямую, но подписан временным CI-ключом и не предназначен для Google Play.
+            - Для каждого пакета приложен SHA-256 файл.
           files: release-assets/*
