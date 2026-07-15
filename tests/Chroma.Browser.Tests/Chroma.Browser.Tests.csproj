@@ -17,5 +17,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Chroma.Browser\Chroma.Browser.csproj" />
   </ItemGroup>
-</Project>
 
+  <ItemGroup>
+    <None Include="..\..\src\Chroma.Browser\**\*.xaml"
+          Link="Xaml\%(RecursiveDir)%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
