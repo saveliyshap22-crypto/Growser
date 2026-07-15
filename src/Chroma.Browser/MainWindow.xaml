@@ -4,66 +4,75 @@
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         Title="Chroma Browser"
-        Width="1360"
-        Height="880"
-        MinWidth="900"
-        MinHeight="620"
+        Width="1380"
+        Height="900"
+        MinWidth="860"
+        MinHeight="600"
         WindowStyle="None"
         ResizeMode="CanResize"
         AllowsTransparency="False"
         Icon="Resources/Chroma.png"
         Loaded="Window_Loaded"
+        Activated="Window_Activated"
+        SizeChanged="Window_SizeChanged"
         Closing="Window_Closing"
         SourceInitialized="Window_SourceInitialized"
         PreviewKeyDown="Window_PreviewKeyDown">
     <shell:WindowChrome.WindowChrome>
         <shell:WindowChrome CaptionHeight="0"
-                            CornerRadius="20"
+                            CornerRadius="22"
                             GlassFrameThickness="0"
                             ResizeBorderThickness="7"
                             UseAeroCaptionButtons="False" />
     </shell:WindowChrome.WindowChrome>
 
-    <Grid x:Name="RootGrid">
+    <Grid x:Name="RootGrid" Background="{DynamicResource WindowBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition x:Name="TitleRow" Height="48" />
-            <RowDefinition x:Name="ToolbarRow" Height="66" />
+            <RowDefinition x:Name="TitleRow" Height="50" />
+            <RowDefinition x:Name="ToolbarRow" Height="68" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0"
-                Background="#E318191D"
-                BorderBrush="#24FFFFFF"
+                Background="{DynamicResource GlassStrongBrush}"
+                BorderBrush="{DynamicResource AccentSoftBrush}"
                 BorderThickness="0,0,0,1"
                 MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="48" />
+                    <ColumnDefinition Width="50" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Border Grid.Column="0" Width="34" Height="34" Margin="7" CornerRadius="12" Background="#20FF8A3D" BorderBrush="#42FF9A52" BorderThickness="1">
-                    <Image Width="25" Height="25" Source="Resources/Chroma.png" IsHitTestVisible="False" />
+                <Border Grid.Column="0" Width="36" Height="36" Margin="7" CornerRadius="13"
+                        Background="{DynamicResource AccentSoftBrush}"
+                        BorderBrush="{DynamicResource AccentMediumBrush}" BorderThickness="1">
+                    <Image Width="26" Height="26" Source="Resources/Chroma.png" IsHitTestVisible="False" />
                 </Border>
 
-                <Grid Grid.Column="1">
+                <Grid Grid.Column="1" Margin="0,0,4,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="44" />
+                        <ColumnDefinition Width="44" />
                     </Grid.ColumnDefinitions>
+
                     <ListBox x:Name="TabStrip"
                              Grid.Column="0"
-                             Height="40"
-                             Margin="0,4,5,3"
+                             Height="42"
+                             Margin="0,4,4,3"
                              HorizontalContentAlignment="Stretch"
                              VerticalContentAlignment="Stretch"
                              Background="Transparent"
                              BorderThickness="0"
-                             ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                             Padding="0"
+                             ScrollViewer.CanContentScroll="True"
+                             ScrollViewer.HorizontalScrollBarVisibility="Auto"
                              ScrollViewer.VerticalScrollBarVisibility="Disabled"
                              SelectionChanged="TabStrip_SelectionChanged"
+                             PreviewMouseWheel="TabStrip_PreviewMouseWheel"
                              AllowDrop="True"
                              PreviewMouseLeftButtonDown="TabStrip_PreviewMouseLeftButtonDown"
                              PreviewMouseMove="TabStrip_PreviewMouseMove"
@@ -75,15 +84,18 @@
                         </ListBox.ItemsPanel>
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
-                                <Setter Property="MinWidth" Value="112" />
+                                <Setter Property="Width" Value="180" />
+                                <Setter Property="MinWidth" Value="76" />
                                 <Setter Property="MaxWidth" Value="240" />
-                                <Setter Property="Height" Value="37" />
+                                <Setter Property="Height" Value="39" />
                                 <Setter Property="Padding" Value="0" />
                                 <Setter Property="Margin" Value="0,0,5,0" />
-                                <Setter Property="Background" Value="#26FFFFFF" />
-                                <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
-                                <Setter Property="BorderBrush" Value="#20FFFFFF" />
+                                <Setter Property="Background" Value="{DynamicResource GlassBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
+                                <Setter Property="BorderBrush" Value="#24FFFFFF" />
                                 <Setter Property="BorderThickness" Value="1" />
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="VerticalContentAlignment" Value="Stretch" />
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate TargetType="ListBoxItem">
@@ -91,18 +103,34 @@
                                                     Background="{TemplateBinding Background}"
                                                     BorderBrush="{TemplateBinding BorderBrush}"
                                                     BorderThickness="{TemplateBinding BorderThickness}"
-                                                    CornerRadius="17">
-                                                <ContentPresenter Margin="2" />
+                                                    CornerRadius="17"
+                                                    ClipToBounds="True"
+                                                    RenderTransformOrigin="0.5,0.5">
+                                                <Border.RenderTransform>
+                                                    <TranslateTransform Y="0" />
+                                                </Border.RenderTransform>
+                                                <Grid>
+                                                    <Border Height="1" Margin="11,0" VerticalAlignment="Top" Background="{DynamicResource GlassHighlightBrush}" />
+                                                    <ContentPresenter Margin="2" />
+                                                </Grid>
                                             </Border>
                                             <ControlTemplate.Triggers>
+                                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <DoubleAnimation Storyboard.TargetName="TabSurface" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.18" />
+                                                            <DoubleAnimation Storyboard.TargetName="TabSurface" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" From="7" To="0" Duration="0:0:0.18" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
                                                 <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter TargetName="TabSurface" Property="Background" Value="#6A3B3D43" />
-                                                    <Setter TargetName="TabSurface" Property="BorderBrush" Value="#45FFFFFF" />
+                                                    <Setter TargetName="TabSurface" Property="Background" Value="{DynamicResource GlassHoverBrush}" />
+                                                    <Setter TargetName="TabSurface" Property="BorderBrush" Value="{DynamicResource AccentMediumBrush}" />
                                                 </Trigger>
                                                 <Trigger Property="IsSelected" Value="True">
-                                                    <Setter TargetName="TabSurface" Property="Background" Value="#DB352A24" />
-                                                    <Setter TargetName="TabSurface" Property="BorderBrush" Value="#82FF9A52" />
-                                                    <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                                                    <Setter TargetName="TabSurface" Property="Background" Value="{DynamicResource AccentSoftBrush}" />
+                                                    <Setter TargetName="TabSurface" Property="BorderBrush" Value="{DynamicResource AccentStrongBrush}" />
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                                                 </Trigger>
                                             </ControlTemplate.Triggers>
                                         </ControlTemplate>
@@ -111,25 +139,42 @@
                             </Style>
                         </ListBox.ItemContainerStyle>
                     </ListBox>
-                    <Button Grid.Column="1" Margin="2,4" Style="{StaticResource IconButton}" Click="NewTab_Click" ToolTip="Новая вкладка (Ctrl+T)" Content="&#xE710;" />
+
+                    <Button x:Name="TabOverviewButton" Grid.Column="1" Margin="2,4" Style="{StaticResource IconButton}"
+                            Click="TabOverview_Click" ToolTip="Все вкладки">
+                        <Grid>
+                            <TextBlock FontFamily="Segoe Fluent Icons" FontSize="15" Text="&#xE8A9;" />
+                            <Border MinWidth="17" Height="17" Margin="20,-17,-9,0" Padding="4,0"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                                    CornerRadius="9" Background="{DynamicResource AccentStrongBrush}">
+                                <TextBlock x:Name="TabCountText" Foreground="{DynamicResource AccentForegroundBrush}"
+                                           FontFamily="Segoe UI" FontSize="9" FontWeight="Bold" Text="1"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                        </Grid>
+                    </Button>
+                    <Button Grid.Column="2" Margin="2,4" Style="{StaticResource IconButton}" Click="NewTab_Click"
+                            ToolTip="Новая вкладка (Ctrl+T)" Content="&#xE710;" />
                 </Grid>
 
-                <Border x:Name="PrivateBadge" Grid.Column="2" Margin="6,8" Padding="13,5" CornerRadius="16" Background="#66352A24" BorderBrush="#55FF9A52" BorderThickness="1" Visibility="Collapsed">
-                    <TextBlock FontSize="12" Foreground="#FFFFC89F" Text="ИНКОГНИТО" />
+                <Border x:Name="PrivateBadge" Grid.Column="2" Margin="6,8" Padding="13,5" CornerRadius="16"
+                        Background="{DynamicResource AccentSoftBrush}" BorderBrush="{DynamicResource AccentMediumBrush}"
+                        BorderThickness="1" Visibility="Collapsed">
+                    <TextBlock FontSize="12" Foreground="{DynamicResource AccentTextBrush}" Text="ИНКОГНИТО" />
                 </Border>
 
                 <StackPanel Grid.Column="3" Orientation="Horizontal" shell:WindowChrome.IsHitTestVisibleInChrome="True">
-                    <Button Width="46" Height="48" Background="Transparent" BorderThickness="0" Foreground="{StaticResource TextBrush}" Click="Minimize_Click" Content="&#xE921;" FontFamily="Segoe Fluent Icons" />
-                    <Button Width="46" Height="48" Background="Transparent" BorderThickness="0" Foreground="{StaticResource TextBrush}" Click="Maximize_Click" Content="&#xE922;" FontFamily="Segoe Fluent Icons" />
-                    <Button Width="50" Height="48" Background="Transparent" BorderThickness="0" Foreground="{StaticResource TextBrush}" Click="Close_Click" Content="&#xE8BB;" FontFamily="Segoe Fluent Icons" />
+                    <Button Width="46" Height="50" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextBrush}" Click="Minimize_Click" Content="&#xE921;" FontFamily="Segoe Fluent Icons" />
+                    <Button Width="46" Height="50" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextBrush}" Click="Maximize_Click" Content="&#xE922;" FontFamily="Segoe Fluent Icons" />
+                    <Button Width="50" Height="50" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextBrush}" Click="Close_Click" Content="&#xE8BB;" FontFamily="Segoe Fluent Icons" />
                 </StackPanel>
             </Grid>
         </Border>
 
-        <Border Grid.Row="1" Margin="9,5,9,7" Padding="9,7" Background="#E8202126" BorderBrush="#36FFFFFF" BorderThickness="1" CornerRadius="27">
-            <Border.Effect>
-                <DropShadowEffect BlurRadius="24" ShadowDepth="5" Opacity="0.22" />
-            </Border.Effect>
+        <Border x:Name="ToolbarSurface" Grid.Row="1" Margin="10,6,10,8" Padding="9,7"
+                Background="{DynamicResource GlassStrongBrush}"
+                BorderBrush="{DynamicResource AccentSoftBrush}" BorderThickness="1"
+                CornerRadius="{DynamicResource PanelCornerRadius}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -144,24 +189,17 @@
                 </StackPanel>
 
                 <Grid Grid.Column="1">
-                    <TextBox x:Name="AddressBar"
-                             Height="46"
-                             Style="{StaticResource GlassTextBox}"
-                             FontSize="14"
-                             TextChanged="AddressBar_TextChanged"
-                             GotKeyboardFocus="AddressBar_GotKeyboardFocus"
+                    <TextBox x:Name="AddressBar" Height="48" Style="{StaticResource GlassTextBox}" FontSize="14"
+                             TextChanged="AddressBar_TextChanged" GotKeyboardFocus="AddressBar_GotKeyboardFocus"
                              PreviewKeyDown="AddressBar_PreviewKeyDown" />
-                    <Popup x:Name="SuggestionsPopup"
-                           PlacementTarget="{Binding ElementName=AddressBar}"
-                           Placement="Bottom"
-                           StaysOpen="False"
-                           AllowsTransparency="True">
-                        <Border Width="640" MaxHeight="370" Margin="0,9,0,0" Padding="7" Background="#FC181A1F" BorderBrush="#55FF9A52" BorderThickness="1" CornerRadius="23">
-                            <ListBox x:Name="SuggestionsList"
-                                     Background="Transparent"
-                                     BorderThickness="0"
-                                     MouseDoubleClick="SuggestionsList_MouseDoubleClick"
-                                     DisplayMemberPath="Display" />
+                    <Popup x:Name="SuggestionsPopup" PlacementTarget="{Binding ElementName=AddressBar}" Placement="Bottom"
+                           StaysOpen="False" AllowsTransparency="True">
+                        <Border Width="640" MaxHeight="370" Margin="0,9,0,0" Padding="7"
+                                Background="{DynamicResource GlassStrongBrush}"
+                                BorderBrush="{DynamicResource AccentMediumBrush}" BorderThickness="1"
+                                CornerRadius="{DynamicResource PanelCornerRadius}">
+                            <ListBox x:Name="SuggestionsList" Background="Transparent" BorderThickness="0"
+                                     MouseDoubleClick="SuggestionsList_MouseDoubleClick" DisplayMemberPath="Display" />
                         </Border>
                     </Popup>
                 </Grid>
@@ -170,7 +208,7 @@
                     <Button x:Name="BookmarkButton" Style="{StaticResource IconButton}" Click="Bookmark_Click" ToolTip="Добавить в закладки (Ctrl+D)" Content="&#xE734;" />
                     <Button x:Name="ShieldButton" MinWidth="44" Width="Auto" Margin="4,0,0,0" Style="{StaticResource GlassButton}" Click="Shield_Click" ToolTip="Защита Chroma">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Foreground="#FFFFA664" FontFamily="Segoe Fluent Icons" Text="&#xEA18;" />
+                            <TextBlock Foreground="{DynamicResource AccentTextBrush}" FontFamily="Segoe Fluent Icons" Text="&#xEA18;" />
                             <TextBlock x:Name="BlockedCountText" Margin="6,0,0,0" Text="0" />
                         </StackPanel>
                     </Button>
@@ -187,40 +225,84 @@
                 <ColumnDefinition x:Name="AiColumn" Width="0" />
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" Margin="9,0,9,9" Background="#FF0D0E11" BorderBrush="#2CFFFFFF" BorderThickness="1" CornerRadius="26" ClipToBounds="True">
+            <Border x:Name="BrowserHostBorder" Grid.Column="0" Margin="10,0,10,10"
+                    Background="#FF0B0C0F" BorderBrush="{DynamicResource AccentSoftBrush}"
+                    BorderThickness="1" CornerRadius="{DynamicResource PanelCornerRadius}" ClipToBounds="True">
                 <ContentControl x:Name="BrowserContent" />
             </Border>
 
-            <Border x:Name="AiPanel" Grid.Column="1" Margin="0,0,9,9" Background="#F518191D" BorderBrush="#4AFF9A52" BorderThickness="1" CornerRadius="26" Visibility="Collapsed">
+            <Border x:Name="AiPanel" Grid.Column="1" Margin="0,0,10,10"
+                    Background="{DynamicResource GlassStrongBrush}"
+                    BorderBrush="{DynamicResource AccentMediumBrush}" BorderThickness="1"
+                    CornerRadius="{DynamicResource PanelCornerRadius}" Visibility="Collapsed" ClipToBounds="True">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="6" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <GridSplitter Grid.Column="0" Width="6" HorizontalAlignment="Stretch" Background="Transparent" DragDelta="AiSplitter_DragDelta" DragCompleted="AiSplitter_DragCompleted" />
-                    <Grid Grid.Column="1" Margin="11">
+                    <GridSplitter Grid.Column="0" Width="6" HorizontalAlignment="Stretch" Background="Transparent"
+                                  DragDelta="AiSplitter_DragDelta" DragCompleted="AiSplitter_DragCompleted" />
+                    <Grid Grid.Column="1" Margin="12">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="44" />
+                            <RowDefinition Height="46" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
-                            <RowDefinition Height="30" />
+                            <RowDefinition Height="32" />
                         </Grid.RowDefinitions>
+
                         <Grid Grid.Row="0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="40" />
+                                <ColumnDefinition Width="42" />
                             </Grid.ColumnDefinitions>
-                            <ComboBox x:Name="AiProviderBox" Height="36" SelectionChanged="AiProviderBox_SelectionChanged" DisplayMemberPath="Name" />
-                            <Button Grid.Column="1" Margin="4,0,0,0" Style="{StaticResource IconButton}" Click="AiClose_Click" Content="&#xE8BB;" />
+                            <ComboBox x:Name="AiProviderBox" Height="38" SelectionChanged="AiProviderBox_SelectionChanged" DisplayMemberPath="Name" />
+                            <Button Grid.Column="1" Margin="4,0,0,0" Style="{StaticResource IconButton}" Click="AiClose_Click" ToolTip="Закрыть AI" Content="&#xE8BB;" />
                         </Grid>
-                        <WrapPanel Grid.Row="1" Margin="0,7,0,9">
-                            <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiSummarize_Click" Content="Пересказать" />
-                            <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiExplain_Click" Content="Объяснить" />
-                            <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiTranslate_Click" Content="Перевести" />
-                            <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiSelection_Click" Content="По выделению" />
+
+                        <Border Grid.Row="1" Margin="0,8,0,8" Padding="10"
+                                Background="{DynamicResource GlassBrush}" BorderBrush="{DynamicResource AccentSoftBrush}"
+                                BorderThickness="1" CornerRadius="{DynamicResource ControlCornerRadius}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBox x:Name="AiPromptBox" MinHeight="74" MaxHeight="150" Padding="8"
+                                         AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                                         Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextBrush}"
+                                         PreviewKeyDown="AiPromptBox_PreviewKeyDown"
+                                         ToolTip="Введите запрос. Ctrl+Enter — вставить его в открытый AI-чат." />
+                                <Grid Grid.Row="1" Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <CheckBox x:Name="AiIncludeContextCheck" Content="Добавить текущую страницу"
+                                              Checked="AiContext_Changed" Unchecked="AiContext_Changed" />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <Button Margin="4,0,0,0" Style="{StaticResource GlassButton}" Click="AiCopyPrompt_Click" Content="Копировать" />
+                                        <Button Margin="4,0,0,0" Style="{StaticResource AccentButton}" Click="AiPasteToChat_Click" Content="Вставить в чат" />
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <WrapPanel Grid.Row="2" Margin="0,0,0,9">
+                            <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiQuickPrompt_Click" Tag="Кратко и структурированно перескажи текущую страницу на русском языке. Выдели главные факты и выводы." Content="Пересказать" />
+                            <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiQuickPrompt_Click" Tag="Объясни содержание текущей страницы простыми словами. Отдельно укажи важные детали и спорные утверждения." Content="Объяснить" />
+                            <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiQuickPrompt_Click" Tag="Переведи содержимое текущей страницы на русский язык, сохраняя структуру и термины." Content="Перевести" />
+                            <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiQuickPrompt_Click" Tag="Проанализируй выделенный текст или код, найди ошибки и предложи конкретные исправления." Content="Разобрать код" />
+                            <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiFillPage_Click" Content="Подставить страницу" />
+                            <Button Margin="0,0,5,5" Style="{StaticResource GlassButton}" Click="AiOpenFull_Click" Content="Открыть во вкладке" />
                         </WrapPanel>
-                        <wv2:WebView2 x:Name="AiWebView" Grid.Row="2" />
-                        <TextBlock x:Name="AiStatus" Grid.Row="3" Margin="4,7,0,0" Foreground="{StaticResource MutedTextBrush}" FontSize="11" Text="ИИ работает через официальный веб-интерфейс выбранного сервиса" TextTrimming="CharacterEllipsis" />
+
+                        <Border Grid.Row="3" Background="#FF0B0C0F" CornerRadius="18" ClipToBounds="True">
+                            <wv2:WebView2 x:Name="AiWebView" />
+                        </Border>
+                        <TextBlock x:Name="AiStatus" Grid.Row="4" Margin="4,8,4,0"
+                                   Foreground="{DynamicResource MutedTextBrush}" FontSize="11"
+                                   Text="Выберите сервис и введите запрос" TextTrimming="CharacterEllipsis" />
                     </Grid>
                 </Grid>
             </Border>
