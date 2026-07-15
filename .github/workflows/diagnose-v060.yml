@@ -26,6 +26,7 @@ jobs:
           $lines = $output -split "`r?`n" | Where-Object { $_ -match 'error (CS|MC|XDG|NETSDK)|: error ' }
           if (-not $lines) { $lines = @('BUILD_OK') }
           $lines | Set-Content .build-errors-v060.txt
+          $global:LASTEXITCODE = 0
       - name: Publish diagnostic result
         shell: pwsh
         run: |
