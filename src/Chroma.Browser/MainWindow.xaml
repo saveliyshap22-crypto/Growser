@@ -78,7 +78,7 @@
                                 <Setter Property="Height" Value="36" />
                                 <Setter Property="Padding" Value="0" />
                                 <Setter Property="Margin" Value="0,0,4,0" />
-                                <Setter Property="Background" Value="#321FFFFFFF" />
+                                <Setter Property="Background" Value="#32FFFFFF" />
                                 <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
                                 <Setter Property="BorderBrush" Value="#22FFFFFF" />
                                 <Setter Property="BorderThickness" Value="1" />
