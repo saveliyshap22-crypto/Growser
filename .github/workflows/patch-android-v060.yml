@@ -1,0 +1,82 @@
+name: Patch Android v0.6.0 source
+
+on:
+  push:
+    paths:
+      - .github/workflows/patch-android-v060.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/chroma-0.6.0-ui-audit
+      - name: Apply audited Android fixes
+        shell: python
+        run: |
+          from pathlib import Path
+          path = Path('android/app/src/main/java/com/chromabrowser/app/MainActivity.java')
+          text = path.read_text(encoding='utf-8')
+
+          replacements = {
+              ' ChromaBrowser/0.3': ' ChromaBrowser/0.6',
+              ' ChromaBrowserAI/0.3': ' ChromaBrowserAI/0.6',
+              'Color.rgb(174, 184, 255)': 'Color.rgb(255, 138, 61)',
+          }
+          for old, new in replacements.items():
+              if old not in text:
+                  raise SystemExit(f'missing expected source fragment: {old}')
+              text = text.replace(old, new)
+
+          old_tabs = '''            GradientDrawable background = new GradientDrawable(
+                          GradientDrawable.Orientation.TL_BR,
+                          index == selectedTab
+                              ? new int[]{Color.argb(235, 65, 70, 82), Color.argb(225, 48, 52, 62)}
+                              : new int[]{Color.argb(110, 52, 56, 64), Color.argb(80, 38, 41, 48)});
+                      background.setCornerRadius(dp(19));
+                      background.setStroke(dp(1), index == selectedTab
+                          ? Color.argb(95, 255, 255, 255)
+                          : Color.argb(38, 255, 255, 255));
+                      chip.setBackground(background);
+                      LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dp(150), dp(38));'''
+          new_tabs = '''            GradientDrawable background = new GradientDrawable(
+                          GradientDrawable.Orientation.TL_BR,
+                          index == selectedTab
+                              ? new int[]{Color.argb(238, 70, 55, 43), Color.argb(232, 47, 42, 39)}
+                              : new int[]{Color.argb(188, 50, 54, 62), Color.argb(170, 31, 34, 40)});
+                      background.setCornerRadius(dp(16));
+                      background.setStroke(dp(1), index == selectedTab
+                          ? Color.argb(150, 255, 138, 61)
+                          : Color.argb(54, 255, 138, 61));
+                      chip.setBackground(background);
+                      int screenWidth = getResources().getDisplayMetrics().widthPixels - dp(20);
+                      int visibleTarget = Math.max(2, Math.min(tabs.size(), 4));
+                      int adaptiveWidth = Math.max(dp(96), Math.min(dp(154), screenWidth / visibleTarget));
+                      LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(adaptiveWidth, dp(38));'''
+          if old_tabs not in text:
+              raise SystemExit('tab layout block changed unexpectedly')
+          text = text.replace(old_tabs, new_tabs)
+
+          old_ai = '''        aiConfigured = true;
+                  aiProviders.put("Mistral", "https://chat.mistral.ai/chat");'''
+          new_ai = '''        aiConfigured = true;
+                  aiProviders.put("ChatGPT", "https://chatgpt.com/");
+                  aiProviders.put("Claude", "https://claude.ai/new");
+                  aiProviders.put("Gemini", "https://gemini.google.com/app");
+                  aiProviders.put("Mistral", "https://chat.mistral.ai/chat");'''
+          if old_ai not in text:
+              raise SystemExit('AI provider block changed unexpectedly')
+          text = text.replace(old_ai, new_ai)
+
+          path.write_text(text, encoding='utf-8')
+      - name: Commit audited Android changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add android/app/src/main/java/com/chromabrowser/app/MainActivity.java
+          git commit -m "Audit Android tabs, version and AI providers"
+          git push origin HEAD:agent/chroma-0.6.0-ui-audit
