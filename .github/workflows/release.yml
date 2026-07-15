@@ -9,7 +9,7 @@ on:
       version:
         description: "Version without v prefix"
         required: true
-        default: "0.3.1"
+        default: "0.3.2"
 
 permissions:
   contents: read
@@ -21,7 +21,7 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 50
     env:
-      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.3.1' }}
+      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.3.2' }}
 
     steps:
       - name: Checkout
@@ -79,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
-      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.3.1' }}
+      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.3.2' }}
 
     steps:
       - name: Checkout
@@ -136,7 +136,7 @@ jobs:
     permissions:
       contents: write
     env:
-      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.3.1' }}
+      RAW_VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event_name == 'workflow_dispatch' && inputs.version || '0.3.2' }}
 
     steps:
       - name: Download verified packages
@@ -168,14 +168,14 @@ jobs:
           target_commitish: ${{ github.sha }}
           name: Chroma Browser ${{ env.RELEASE_TAG }}
           body: |
-            ## Chroma Browser 0.3.1
+            ## Chroma Browser 0.3.2
 
             Исправление запуска Windows-версии.
 
-            - Исправлено падение `XamlParseException` из-за отсутствующего WPF-ресурса `resources/chroma.ico`.
-            - Иконка окна теперь использует встроенный `Chroma.png`, а ICO остаётся иконкой EXE и установщика.
-            - Добавлен тест, проверяющий наличие ресурсов окна внутри WPF-сборки.
-            - Windows и Android версии синхронизированы до 0.3.1.
+            - Исправлен некорректный WPF-цвет `#321FFFFFFF`, вызывавший `FormatException: Недопустимый маркер` при создании главного окна.
+            - Цвет фона вкладки заменён на корректный ARGB-маркер `#32FFFFFF`.
+            - Добавлен тест, проверяющий допустимую длину всех шестнадцатеричных цветов во всех XAML-файлах.
+            - Windows и Android версии синхронизированы до 0.3.2.
             - Windows: используйте Setup EXE или portable ZIP.
             - Android: preview APK подписан временным CI-ключом и не предназначен для Google Play.
             - Для каждого пакета приложен SHA-256 файл.
