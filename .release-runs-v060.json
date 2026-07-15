@@ -1,0 +1,24 @@
+{
+  "runs": [
+    {
+      "id": 29430847107,
+      "name": "Multi-platform CI",
+      "event": "push",
+      "status": "in_progress",
+      "conclusion": null,
+      "created_at": "2026-07-15T16:04:03Z",
+      "updated_at": "2026-07-15T16:04:08Z",
+      "html_url": "https://github.com/saveliyshap22-crypto/Growser/actions/runs/29430847107"
+    },
+    {
+      "id": 29430846894,
+      "name": "Release",
+      "event": "push",
+      "status": "in_progress",
+      "conclusion": null,
+      "created_at": "2026-07-15T16:04:02Z",
+      "updated_at": "2026-07-15T16:04:08Z",
+      "html_url": "https://github.com/saveliyshap22-crypto/Growser/actions/runs/29430846894"
+    }
+  ]
+}
